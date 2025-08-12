@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Betting Strategy Performance Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <header>
+        <h1>Performance Dashboard</h1>
+    </header>
+
+    <main>
+        <section class="kpi-section">
+            <div class="kpi-card">
+                <h3>Total Bets</h3>
+                <p id="total-bets">-</p>
+            </div>
+            <div class="kpi-card">
+                <h3>Win Rate</h3>
+                <p id="win-rate">-</p>
+            </div>
+            <div class="kpi-card">
+                <h3>Net Profit</h3>
+                <p id="net-profit">-</p>
+            </div>
+            <div class="kpi-card">
+                <h3>ROI (%)</h3>
+                <p id="roi">-</p>
+            </div>
+        </section>
+
+        <section class="chart-section">
+            <h2>Profit Trends</h2>
+            <canvas id="profitTrendsChart"></canvas>
+            
+            <h2>Running P&L</h2>
+            <canvas id="runningPnlChart"></canvas>
+        </section>
+
+        <section class="history-section">
+            <h2>Recent Bets Log</h2>
+            <table id="bet-history-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Match</th>
+                        <th>League</th>
+                        <th>Bet Type</th>
+                        <th>Outcome</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    </tbody>
+            </table>
+        </section>
+    </main>
+
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+</body>
+</html>
