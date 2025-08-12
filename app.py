@@ -1,4 +1,5 @@
 from flask import Flask, render_template, jsonify, request
+import firebase_admin
 from firebase_admin import firestore, credentials, initialize_app
 import os
 import json
