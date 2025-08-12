@@ -1,4 +1,5 @@
 ##Football Betting Strategy Dashboard##
+
 This repository contains the code for a web-based performance dashboard designed to visualize and analyze the results of an automated football betting strategy. The dashboard provides key performance metrics (KPIs), advanced analytics, and detailed bet history, all powered by data stored in a Firebase Firestore database.
 The core logic for placing and tracking bets is handled by a separate bot (not included in this repository) that populates the Firestore database. This web application's sole purpose is to provide a user-friendly interface for monitoring and evaluating the strategy's effectiveness.
 Features
