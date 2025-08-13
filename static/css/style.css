@@ -1,93 +1,203 @@
-/* Custom CSS for Betting Strategy Dashboard */
+/* Vibrant Betting Dashboard CSS */
 
-/* General Body and Font Styles */
+/* Base Styles */
+:root {
+  --primary-color: #4361ee;
+  --secondary-color: #3a0ca3;
+  --success-color: #4cc9f0;
+  --danger-color: #f72585;
+  --warning-color: #f8961e;
+  --info-color: #4895ef;
+  --light-color: #f8f9fa;
+  --dark-color: #212529;
+  --win-color: #2ec4b6;
+  --loss-color: #e71d36;
+  --profit-color: #06d6a0;
+  --loss-bg-color: #ffddd2;
+}
+
 body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    transition: background-color 0.3s, color 0.3s;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f5f7fa;
+  color: #333;
 }
 
 /* Header & Navbar */
+.navbar {
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
 .navbar-brand {
-    font-weight: 700;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 /* Card Styles */
 .card {
-    border-radius: 0.75rem;
-    border: none;
-    transition: transform 0.2s ease-in-out;
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  overflow: hidden;
 }
 
 .card:hover {
-    transform: translateY(-5px);
+  transform: translateY(-5px);
+  box-shadow: 0 12px 20px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+  background: linear-gradient(90deg, rgba(67, 97, 238, 0.1), rgba(58, 12, 163, 0.1));
+  border-bottom: none;
+  padding: 1rem 1.5rem;
 }
 
 .card-title {
-    font-weight: 600;
+  font-weight: 600;
+  color: var(--primary-color);
+  margin-bottom: 0;
 }
 
-/* KPI Card Text */
+/* KPI Cards */
+.kpi-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.kpi-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: var(--primary-color);
+}
+
+.kpi-card .card-body {
+  padding: 1.5rem;
+}
+
 .card-text.fs-2 {
-    font-weight: 700;
+  font-weight: 700;
+  margin-top: 0.5rem;
 }
 
-/* Chart Canvas Styling */
-canvas {
-    max-height: 400px;
+.text-success {
+  color: var(--win-color) !important;
+}
+
+.text-danger {
+  color: var(--loss-color) !important;
+}
+
+/* Chart Containers */
+.chart-container {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.05);
+  margin-bottom: 2rem;
 }
 
 /* Table Styles */
+.table-responsive {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.05);
+}
+
 .table {
-    white-space: nowrap;
+  margin-bottom: 0;
+}
+
+.table thead {
+  background: linear-gradient(90deg, rgba(67, 97, 238, 0.1), rgba(58, 12, 163, 0.1));
+  color: var(--primary-color);
+}
+
+.table th {
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  letter-spacing: 0.5px;
+  border-bottom: none;
 }
 
 .table-hover tbody tr:hover {
-    --bs-table-hover-bg: rgba(0, 0, 0, 0.03); /* Subtle hover effect */
+  background-color: rgba(67, 97, 238, 0.05);
 }
 
-/* Outcome-specific colors in the table */
-.table tbody tr td:nth-child(5) {
-    font-weight: 600;
+/* Outcome Badges */
+.outcome-badge {
+  padding: 0.35rem 0.65rem;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-.table tbody tr td:nth-child(5):contains('win') {
-    color: #198754; /* Bootstrap success green */
+.badge-win {
+  background-color: rgba(46, 196, 182, 0.1);
+  color: var(--win-color);
 }
 
-.table tbody tr td:nth-child(5):contains('loss') {
-    color: #dc3545; /* Bootstrap danger red */
+.badge-loss {
+  background-color: rgba(231, 29, 54, 0.1);
+  color: var(--loss-color);
 }
 
-/* Dark Mode Implementation (Optional) */
-@media (prefers-color-scheme: dark) {
-    body.bg-light {
-        background-color: #1a1a1a !important;
-        color: #e0e0e0;
-    }
-    .navbar.bg-primary {
-        background-color: #151515 !important;
-    }
-    .card {
-        background-color: #2a2a2a;
-        color: #e0e0e0;
-    }
-    .card-header.bg-white {
-        background-color: #333333 !important;
-        color: #e0e0e0;
-    }
-    .card-title, .text-muted {
-        color: #b0b0b0 !important;
-    }
-    .table {
-        --bs-table-bg: #2a2a2a;
-        --bs-table-color: #e0e0e0;
-    }
-    .table-light {
-        --bs-table-bg: #333333;
-        --bs-table-color: #e0e0e0;
-    }
-    .table-hover tbody tr:hover {
-        --bs-table-hover-bg: rgba(255, 255, 255, 0.05);
-    }
+/* Date Picker */
+.form-control {
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  padding: 0.5rem 1rem;
 }
 
+/* Buttons */
+.btn-primary {
+  background-color: var(--primary-color);
+  border: none;
+  border-radius: 8px;
+  padding: 0.5rem 1.5rem;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 8px rgba(67, 97, 238, 0.2);
+}
+
+.btn-primary:hover {
+  background-color: var(--secondary-color);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(67, 97, 238, 0.3);
+}
+
+.btn-outline-secondary {
+  border-radius: 8px;
+  padding: 0.5rem 1.5rem;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.card, .chart-container, .table-responsive {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .card {
+    margin-bottom: 1.5rem;
+  }
+  
+  .chart-container {
+    padding: 1rem;
+  }
+}
