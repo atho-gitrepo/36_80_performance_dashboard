@@ -75,39 +75,54 @@ def calculate_kpis(bets):
     }
 
 def get_resolved_bets_data(start_date=None, end_date=None):
-    """Fetches resolved bets from Firestore, with optional date filtering."""
+    """More robust data fetcher with debug capabilities"""
     try:
-        query = db.collection('resolved_bets')
+        col_ref = db.collection('resolved_bets')
+        query = col_ref
         
-        # Debug logging
-        logger.info(f"Fetching resolved bets between {start_date} and {end_date}")
+        # Debug: Print collection stats
+        print(f"📊 Collection stats: {col_ref.count().get()[0]} total documents")
         
+        # Convert string dates to datetime if needed
+        if isinstance(start_date, str):
+            start_date = datetime.fromisoformat(start_date)
+        if isinstance(end_date, str):
+            end_date = datetime.fromisoformat(end_date)
+        
+        # Apply date filters if provided
         if start_date:
-            if isinstance(start_date, str):
-                start_date = datetime.fromisoformat(start_date)
             query = query.where('placed_at', '>=', start_date)
         if end_date:
-            if isinstance(end_date, str):
-                end_date = datetime.fromisoformat(end_date)
             query = query.where('placed_at', '<=', end_date)
-            
+        
+        # Add debug query
+        debug_query = query.limit(1)
+        print(f"🔍 Sample document: {[doc.to_dict() for doc in debug_query.stream()]}")
+        
+        # Get full results
         docs = query.order_by('placed_at', direction=firestore.Query.DESCENDING).stream()
         bets = []
         
         for doc in docs:
-            bet_data = doc.to_dict()
-            # Ensure all bets have required fields
-            bet_data.setdefault('outcome', 'unknown')
-            bet_data.setdefault('bet_type', 'unknown')
-            bet_data.setdefault('league', 'unknown')
-            bets.append(bet_data)
+            data = doc.to_dict()
+            # Ensure required fields exist
+            data['id'] = doc.id
+            data.setdefault('outcome', 'unknown')
+            data.setdefault('placed_at', datetime.utcnow().isoformat())
+            bets.append(data)
         
-        logger.info(f"Found {len(bets)} resolved bets")
+        print(f"✅ Found {len(bets)} resolved bets")
         return bets
         
     except Exception as e:
-        logger.error(f"Error fetching resolved bets: {e}")
-        return []
+        print(f"🔥 Error fetching resolved bets: {e}")
+        # Try fallback query without filters
+        try:
+            docs = db.collection('resolved_bets').limit(10).stream()
+            return [doc.to_dict() for doc in docs]
+        except Exception as fallback_error:
+            print(f"🔥 Fallback query failed: {fallback_error}")
+            return []
 
 # --- Flask Routes ---
 @app.route('/')
