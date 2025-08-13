@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 
 app = Flask(__name__)
 
-# --- Firebase Initialization (Modified for a web app) ---
+# --- Firebase Initialization ---
 try:
     FIREBASE_CREDENTIALS_JSON_STRING = os.getenv("FIREBASE_CREDENTIALS_JSON")
     if not FIREBASE_CREDENTIALS_JSON_STRING:
@@ -22,7 +22,6 @@ try:
     print("✅ Web app: Firebase initialized successfully.")
 except Exception as e:
     print(f"❌ Web app: Failed to initialize Firebase: {e}")
-    # Consider what to do here. Maybe render an error page.
 
 # --- Data Processing Functions ---
 def calculate_kpis(bets):
@@ -43,7 +42,7 @@ def calculate_kpis(bets):
     net_profit = win_count - (total_bets - win_count)
     roi = (net_profit / total_bets) * 100 if total_bets > 0 else 0
     
-    # Calculate streaks (simplified)
+    # Calculate streaks
     current_win_streak = 0
     biggest_win_streak = 0
     current_loss_streak = 0
@@ -92,7 +91,6 @@ def index():
 @app.route('/api/dashboard_data')
 def get_dashboard_data():
     """API endpoint to fetch processed data for the dashboard."""
-    
     # Get date range from request or set defaults
     start_date_str = request.args.get('start_date')
     end_date_str = request.args.get('end_date')
@@ -105,12 +103,13 @@ def get_dashboard_data():
     
     kpis = calculate_kpis(bets)
     
-    # More complex calculations
+    # Initialize data structures
     performance_by_league = {}
     performance_by_type = {}
-    profit_trends = {}
+    daily_results = {}
     cumulative_pnl = 0
     running_pnl_data = []
+    daily_pnl = {}  # Track daily net profit
     
     for bet in sorted(bets, key=lambda x: x.get('placed_at')):
         # Performance by League
@@ -131,25 +130,43 @@ def get_dashboard_data():
         else:
             performance_by_type[bet_type]['losses'] += 1
             
-        # Profit Trends
+        # Daily Results
         date_key = datetime.fromisoformat(bet['placed_at']).strftime('%Y-%m-%d')
-        if date_key not in profit_trends:
-            profit_trends[date_key] = 0
+        if date_key not in daily_results:
+            daily_results[date_key] = {"wins": 0, "losses": 0, "net": 0}
+        
+        if bet['outcome'] == 'win':
+            daily_results[date_key]["wins"] += 1
+            daily_results[date_key]["net"] += 1
+        else:
+            daily_results[date_key]["losses"] += 1
+            daily_results[date_key]["net"] -= 1
         
         # Cumulative P&L
         cumulative_pnl += 1 if bet['outcome'] == 'win' else -1
         running_pnl_data.append({"date": date_key, "pnl": cumulative_pnl})
         
+    # Convert daily results to sorted list
+    daily_results_list = [
+        {
+            "date": date, 
+            "wins": data["wins"], 
+            "losses": data["losses"],
+            "net": data["net"]
+        }
+        for date, data in daily_results.items()
+    ]
+    daily_results_list.sort(key=lambda x: x["date"])
+    
     return jsonify({
         "kpis": kpis,
         "performance_by_league": performance_by_league,
         "performance_by_type": performance_by_type,
-        "profit_trends": profit_trends,
+        "daily_results": daily_results_list,
         "running_pnl": running_pnl_data,
-        "recent_bets": bets[:50] # Limit to 50 for the log table
+        "recent_bets": bets[:50]
     })
 
 if __name__ == '__main__':
-    # Running locally for development
     app.run(debug=True, port=8000)
 
