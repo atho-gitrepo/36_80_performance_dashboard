@@ -91,9 +91,9 @@ def get_resolved_bets_data(start_date=None, end_date=None):
         
         # Apply date filters if provided
         if start_date:
-            query = query.where('resolved_at', '>=', start_date)
+            query = query.where('placed_at', '>=', start_date)
         if end_date:
-            query = query.where('resolved_at', '<=', end_date)
+            query = query.where('placed_at', '<=', end_date)
         
         # Add debug query
         debug_query = query.limit(1)
@@ -108,7 +108,7 @@ def get_resolved_bets_data(start_date=None, end_date=None):
             # Ensure required fields exist
             data['id'] = doc.id
             data.setdefault('outcome', 'unknown')
-            data.setdefault('resolved_at', datetime.utcnow().isoformat())
+            data.setdefault('placed_at', datetime.utcnow().isoformat())
             bets.append(data)
         
         print(f"✅ Found {len(bets)} resolved bets")
@@ -156,7 +156,7 @@ def get_dashboard_data():
         cumulative_pnl = 0
         running_pnl_data = []
         
-        for bet in sorted(bets, key=lambda x: x.get('resolved_at', '')):
+        for bet in sorted(bets, key=lambda x: x.get('placed_at', '')):
             # Performance by League
             league = bet.get('league', 'Unknown')
             if league not in performance_by_league:
@@ -176,7 +176,7 @@ def get_dashboard_data():
                 performance_by_type[bet_type]['losses'] += 1
                 
             # Daily Results
-            placed_at = bet.get('resolved_at')
+            placed_at = bet.get('placed_at')
             if isinstance(placed_at, str):
                 placed_at = datetime.fromisoformat(placed_at)
             date_key = placed_at.strftime('%Y-%m-%d') if placed_at else 'unknown-date'
