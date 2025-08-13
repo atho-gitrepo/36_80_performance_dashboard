@@ -77,28 +77,18 @@ def calculate_kpis(bets):
 
 def get_resolved_bets_data(start_date=None, end_date=None):
     try:
-        col_ref = db.collection('resolved_bets')
-        
-        # Convert string dates to datetime
-        if start_date and isinstance(start_date, str):
-            start_date = datetime.fromisoformat(start_date.replace('Z', '+00:00'))
-        if end_date and isinstance(end_date, str):
-            end_date = datetime.fromisoformat(end_date.replace('Z', '+00:00'))
-        
-        # Build query with explicit FieldFilter
-        query = col_ref.order_by('placed_at')
+        query = db.collection('resolved_bets')
         
         if start_date and end_date:
-            query = query.where(filter=FieldFilter('placed_at', '>=', start_date)) \
-                       .where(filter=FieldFilter('placed_at', '<=', end_date))
+            # Use range filter on single field
+            query = query.where('placed_at', '>=', start_date) \
+                         .where('placed_at', '<=', end_date)
         elif start_date:
-            query = query.where(filter=FieldFilter('placed_at', '>=', start_date))
+            query = query.where('placed_at', '>=', start_date)
         elif end_date:
-            query = query.where(filter=FieldFilter('placed_at', '<=', end_date))
-        
-        docs = query.stream()
-        return [doc.to_dict() for doc in docs]
-        
+            query = query.where('placed_at', '<=', end_date)
+            
+        return [doc.to_dict() for doc in query.stream()]
     except Exception as e:
         print(f"Error: {e}")
         return []
