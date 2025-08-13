@@ -76,21 +76,59 @@ def calculate_kpis(bets):
     }
 
 def get_resolved_bets_data(start_date=None, end_date=None):
+    """Robust data fetcher with proper date handling"""
     try:
-        query = db.collection('resolved_bets')
+        col_ref = db.collection('resolved_bets')
         
-        if start_date and end_date:
-            # Use range filter on single field
-            query = query.where('placed_at', '>=', start_date) \
-                         .where('placed_at', '<=', end_date)
-        elif start_date:
-            query = query.where('placed_at', '>=', start_date)
-        elif end_date:
-            query = query.where('placed_at', '<=', end_date)
+        # Convert string dates to datetime if needed
+        if start_date and isinstance(start_date, str):
+            try:
+                start_date = datetime.fromisoformat(start_date.replace('Z', '+00:00'))
+            except ValueError:
+                print(f"⚠️ Invalid start_date format: {start_date}")
+                start_date = None
+                
+        if end_date and isinstance(end_date, str):
+            try:
+                end_date = datetime.fromisoformat(end_date.replace('Z', '+00:00'))
+            except ValueError:
+                print(f"⚠️ Invalid end_date format: {end_date}")
+                end_date = None
+        
+        # Build query with preferred syntax
+        query = col_ref
+        
+        if start_date:
+            query = query.filter(filter=FieldFilter('placed_at', '>=', start_date))
+        if end_date:
+            query = query.filter(filter=FieldFilter('placed_at', '<=', end_date))
+        
+        # Debug: Print the actual query being executed
+        print(f"🔍 Executing query: placed_at between {start_date} and {end_date}")
+        
+        # Get results with timestamp conversion
+        docs = query.order_by('placed_at', direction=firestore.Query.DESCENDING).stream()
+        bets = []
+        
+        for doc in docs:
+            data = doc.to_dict()
             
-        return [doc.to_dict() for doc in query.stream()]
+            # Ensure placed_at is in correct format
+            placed_at = data.get('placed_at')
+            if isinstance(placed_at, str):
+                try:
+                    data['placed_at'] = datetime.fromisoformat(placed_at.replace('Z', '+00:00'))
+                except ValueError:
+                    print(f"⚠️ Invalid placed_at format in document {doc.id}: {placed_at}")
+                    continue
+            
+            bets.append(data)
+        
+        print(f"✅ Found {len(bets)} resolved bets")
+        return bets
+        
     except Exception as e:
-        print(f"Error: {e}")
+        print(f"🔥 Error in get_resolved_bets_data: {e}")
         return []
 
 # --- Flask Routes ---
