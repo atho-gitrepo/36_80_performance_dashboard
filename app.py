@@ -5,6 +5,7 @@ import os
 import json
 from datetime import datetime, timedelta
 import logging
+from google.cloud.firestore_v1.base_query import FieldFilter
 
 app = Flask(__name__)
 
