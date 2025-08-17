@@ -9,8 +9,8 @@ document.addEventListener('DOMContentLoaded', () => {
 async function fetchDashboardData() {
     const start_date = document.getElementById('startDate').value;
     const end_date = document.getElementById('endDate').value;
-    const match_name = document.getElementById('matchName').value;
-    const league = document.getElementById('leagueName').value;
+    const match_name = document.getElementById('matchName') ? document.getElementById('matchName').value : '';
+    const league = document.getElementById('leagueName') ? document.getElementById('leagueName').value : '';
 
     const queryParams = new URLSearchParams();
     if (start_date) queryParams.append('start_date', start_date);
@@ -40,12 +40,10 @@ async function fetchDashboardData() {
 }
 
 function updateKPIs(kpis) {
-    document.getElementById('totalBets').textContent = kpis.total_bets;
-    document.getElementById('winRate').textContent = `${kpis.win_rate}%`;
-    document.getElementById('netProfit').textContent = kpis.net_profit;
+    document.getElementById('total-bets').textContent = kpis.total_bets;
+    document.getElementById('win-rate').textContent = `${kpis.win_rate}%`;
+    document.getElementById('net-profit').textContent = kpis.net_profit;
     document.getElementById('roi').textContent = `${kpis.roi}%`;
-    document.getElementById('winStreak').textContent = kpis.biggest_win_streak;
-    document.getElementById('lossStreak').textContent = kpis.biggest_loss_streak;
 }
 
 function updateRecentBetsTable(bets) {
@@ -54,12 +52,13 @@ function updateRecentBetsTable(bets) {
 
     bets.forEach(bet => {
         const row = document.createElement('tr');
+        const outcomeClass = bet.outcome === 'win' ? 'win-text' : 'loss-text';
         row.innerHTML = `
             <td>${bet.match_name}</td>
             <td>${bet.league}</td>
             <td>${bet.country}</td>
             <td>${bet.bet_type}</td>
-            <td>${bet.outcome}</td>
+            <td class="${outcomeClass}">${bet.outcome}</td>
             <td>${bet.placed_at ? new Date(bet.placed_at).toLocaleString() : 'N/A'}</td>
         `;
         tableBody.appendChild(row);
@@ -67,17 +66,23 @@ function updateRecentBetsTable(bets) {
 }
 
 // --- New Chart Functions ---
+let scoreChartInstance = null;
+let dayChartInstance = null;
 
 // Creates a chart showing wins/losses grouped by initial score
 function createOutcomeByScoreChart(data) {
     const ctx = document.getElementById('outcomeByScoreChart').getContext('2d');
     
-    // Convert data object to arrays for chart.js
+    // Destroy previous chart instance if it exists
+    if (scoreChartInstance) {
+        scoreChartInstance.destroy();
+    }
+
     const labels = Object.keys(data);
     const winData = labels.map(label => data[label].wins);
     const lossData = labels.map(label => data[label].losses);
 
-    new Chart(ctx, {
+    scoreChartInstance = new Chart(ctx, {
         type: 'bar',
         data: {
             labels: labels,
@@ -119,14 +124,18 @@ function createOutcomeByScoreChart(data) {
 // Creates a chart showing performance by day of the week
 function createPerformanceByDayChart(data) {
     const ctx = document.getElementById('performanceByDayChart').getContext('2d');
+
+    // Destroy previous chart instance if it exists
+    if (dayChartInstance) {
+        dayChartInstance.destroy();
+    }
     
-    // Order days of the week correctly
     const daysOrder = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
     const labels = daysOrder.filter(day => data[day]);
     const winData = labels.map(day => data[day].wins);
     const lossData = labels.map(day => data[day].losses);
 
-    new Chart(ctx, {
+    dayChartInstance = new Chart(ctx, {
         type: 'line',
         data: {
             labels: labels,
