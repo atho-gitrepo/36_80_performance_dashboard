@@ -68,16 +68,20 @@ def calculate_kpis(bets):
         "biggest_loss_streak": biggest_loss_streak,
     }
 
-def get_resolved_bets_data(start_date=None, end_date=None):
-    """Fetches resolved bets from Firestore, with optional date filtering."""
+def get_resolved_bets_data(start_date=None, end_date=None, match_name=None, league_name=None):
+    """Fetches resolved bets from Firestore, with optional date and name filtering."""
     try:
         query = db.collection('resolved_bets')
         if start_date:
             query = query.where('placed_at', '>=', start_date)
         if end_date:
             query = query.where('placed_at', '<=', end_date)
-            
-        docs = query.order_by('placed_at', direction=firestore.Query.DESCENDING).stream()
+        if match_name:
+            query = query.where('match_name', '==', match_name)
+        if league_name:
+            query = query.where('league', '==', league_name)
+
+        docs = query.order_by('resolved_at', direction=firestore.Query.DESCENDING).stream()
         return [doc.to_dict() for doc in docs]
     except Exception as e:
         print(f"❌ Firestore Error during data fetch: {e}")
@@ -93,62 +97,57 @@ def index():
 def get_dashboard_data():
     """API endpoint to fetch processed data for the dashboard."""
     
-    # Get date range from request or set defaults
+    # Get date range and filters from request
     start_date_str = request.args.get('start_date')
     end_date_str = request.args.get('end_date')
+    match_name = request.args.get('match_name')
+    league_name = request.args.get('league')
 
-    # Convert date strings to datetime objects for filtering
     start_date = datetime.fromisoformat(start_date_str) if start_date_str else None
     end_date = datetime.fromisoformat(end_date_str) if end_date_str else None
 
-    bets = get_resolved_bets_data(start_date, end_date)
+    bets = get_resolved_bets_data(start_date, end_date, match_name, league_name)
     
     kpis = calculate_kpis(bets)
     
-    # More complex calculations
-    performance_by_league = {}
-    performance_by_type = {}
-    profit_trends = {}
-    cumulative_pnl = 0
-    running_pnl_data = []
+    # New data structures to replace profit trends
+    outcome_by_initial_score = {}
+    performance_by_day_of_week = {}
     
-    for bet in sorted(bets, key=lambda x: x.get('placed_at')):
-        # Performance by League
-        league = bet.get('league', 'Unknown')
-        if league not in performance_by_league:
-            performance_by_league[league] = {"wins": 0, "losses": 0}
-        if bet['outcome'] == 'win':
-            performance_by_league[league]['wins'] += 1
-        else:
-            performance_by_league[league]['losses'] += 1
-            
-        # Performance by Bet Type
+    for bet in bets:
+        # Determine the initial score key
         bet_type = bet.get('bet_type', 'Unknown')
-        if bet_type not in performance_by_type:
-            performance_by_type[bet_type] = {"wins": 0, "losses": 0}
+        initial_score_key = '36_score' if bet_type == 'regular' else '80_score'
+        initial_score = bet.get(initial_score_key, 'N/A')
+        
+        # Performance by Initial Score
+        if initial_score not in outcome_by_initial_score:
+            outcome_by_initial_score[initial_score] = {"wins": 0, "losses": 0}
+        
         if bet['outcome'] == 'win':
-            performance_by_type[bet_type]['wins'] += 1
+            outcome_by_initial_score[initial_score]['wins'] += 1
         else:
-            performance_by_type[bet_type]['losses'] += 1
+            outcome_by_initial_score[initial_score]['losses'] += 1
             
-        # Profit Trends
-        date_key = datetime.fromisoformat(bet['placed_at']).strftime('%Y-%m-%d')
-        if date_key not in profit_trends:
-            profit_trends[date_key] = 0
-        
-        # Cumulative P&L
-        cumulative_pnl += 1 if bet['outcome'] == 'win' else -1
-        running_pnl_data.append({"date": date_key, "pnl": cumulative_pnl})
-        
+        # Performance by Day of the Week
+        placed_at = bet.get('placed_at')
+        if placed_at:
+            day_of_week = datetime.fromisoformat(placed_at).strftime('%A')
+            if day_of_week not in performance_by_day_of_week:
+                performance_by_day_of_week[day_of_week] = {"wins": 0, "losses": 0}
+            if bet['outcome'] == 'win':
+                performance_by_day_of_week[day_of_week]['wins'] += 1
+            else:
+                performance_by_day_of_week[day_of_week]['losses'] += 1
+
     return jsonify({
         "kpis": kpis,
-        "performance_by_league": performance_by_league,
-        "performance_by_type": performance_by_type,
-        "profit_trends": profit_trends,
-        "running_pnl": running_pnl_data,
-        "recent_bets": bets[:50] # Limit to 50 for the log table
+        "outcome_by_initial_score": outcome_by_initial_score,
+        "performance_by_day_of_week": performance_by_day_of_week,
+        "recent_bets": bets[:50]
     })
 
 if __name__ == '__main__':
     # Running locally for development
     app.run(debug=True, port=8000)
+
