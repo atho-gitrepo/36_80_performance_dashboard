@@ -114,6 +114,10 @@ def get_dashboard_data():
     outcome_by_initial_score = {}
     performance_by_day_of_week = {}
     
+    # New data structures for the new charts
+    performance_by_country = {}
+    performance_by_bet_type = {}
+    
     for bet in bets:
         # Determine the initial score key
         bet_type = bet.get('bet_type', 'Unknown')
@@ -139,15 +143,34 @@ def get_dashboard_data():
                 performance_by_day_of_week[day_of_week]['wins'] += 1
             else:
                 performance_by_day_of_week[day_of_week]['losses'] += 1
+                
+        # --- New: Performance by Country ---
+        country = bet.get('country', 'Unknown')
+        if country not in performance_by_country:
+            performance_by_country[country] = {"wins": 0, "losses": 0}
+        if bet['outcome'] == 'win':
+            performance_by_country[country]['wins'] += 1
+        else:
+            performance_by_country[country]['losses'] += 1
+
+        # --- New: Performance by Bet Type ---
+        bet_type_name = bet.get('bet_type', 'Unknown')
+        if bet_type_name not in performance_by_bet_type:
+            performance_by_bet_type[bet_type_name] = {"wins": 0, "losses": 0}
+        if bet['outcome'] == 'win':
+            performance_by_bet_type[bet_type_name]['wins'] += 1
+        else:
+            performance_by_bet_type[bet_type_name]['losses'] += 1
 
     return jsonify({
         "kpis": kpis,
         "outcome_by_initial_score": outcome_by_initial_score,
         "performance_by_day_of_week": performance_by_day_of_week,
+        "performance_by_country": performance_by_country,
+        "performance_by_bet_type": performance_by_bet_type,
         "recent_bets": bets[:50]
     })
 
 if __name__ == '__main__':
     # Running locally for development
     app.run(debug=True, port=8000)
-
