@@ -1,193 +1,164 @@
 /*========================================================================================
     1. TYPOGRAPHY & TEXT EFFECTS
 ========================================================================================*/
-
-/* Set a clean, modern font stack for the entire application. */
 body {
     font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    color: #495057; /* A soft, dark gray for good readability. */
+    color: #2c3e50;
     transition: background-color 0.4s ease, color 0.4s ease;
 }
 
-/* Use a slightly bolder font-weight for headings and important text. */
 .navbar-brand, .card-title, .fs-2 {
-    font-weight: 600;
+    font-weight: 700;
     letter-spacing: -0.5px;
-}
-
-/* Add a subtle underline effect on hover for clickable elements. */
-.card:hover, .btn:hover {
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 /*========================================================================================
-    2. BACKGROUND & LAYOUT
+    2. BACKGROUND & LAYOUT - COLORFUL THEME
 ========================================================================================*/
-
-/* A clean, consistent background with a soft gradient. */
 body.bg-light {
-    background: #f8f9fa;
-    /* Optional: subtle radial gradient for depth. */
-    /* background: radial-gradient(circle at top left, #f8f9fa, #e9ecef); */
+    background: linear-gradient(135deg, #f5f7fa 0%, #e4e7f4 100%);
 }
 
-/* Add a modern, glassy effect to the cards using a backdrop filter. */
+.navbar.bg-primary {
+    background: linear-gradient(90deg, #4361ee 0%, #3a0ca3 100%) !important;
+    box-shadow: 0 4px 20px rgba(67, 97, 238, 0.3);
+}
+
 .card {
-    border-radius: 1rem; /* More rounded corners. */
-    border: 1px solid rgba(0, 0, 0, 0.05);
-    background-color: rgba(255, 255, 255, 0.9);
-    backdrop-filter: blur(10px); /* This creates the frosted glass effect. */
-    -webkit-backdrop-filter: blur(10px);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    border-radius: 1rem;
+    border: none;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 8px 16px rgba(67, 97, 238, 0.15);
+    overflow: hidden;
+    position: relative;
+}
+
+.card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #4cc9f0 0%, #4361ee 50%, #3a0ca3 100%);
 }
 
 /*========================================================================================
     3. ANIMATIONS & TRANSITIONS
 ========================================================================================*/
-
-/* Apply a smooth transition to all transforms and box-shadows. */
 .card, .btn {
     transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
-/* A slight bounce effect on hover for cards. */
 .card:hover {
     transform: translateY(-8px) scale(1.02);
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 15px 30px rgba(67, 97, 238, 0.25);
 }
 
-/* Ripple effect on buttons (requires JS). */
-/* For CSS-only, use a pseudo-element. */
-.btn {
-    position: relative;
-    overflow: hidden;
-    z-index: 1;
-}
-
+/* Enhanced ripple effect */
 .btn:after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 5px;
-    height: 5px;
-    background: rgba(255, 255, 255, 0.5);
-    opacity: 0;
-    border-radius: 50%;
-    transform: scale(0);
-    transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
-}
-
-.btn:active:after {
-    transform: scale(40);
-    opacity: 1;
+    background: rgba(255, 255, 255, 0.7);
 }
 
 /*========================================================================================
-    4. BUTTONS & UI ELEMENTS
+    4. BUTTONS & UI ELEMENTS - COLORFUL
 ========================================================================================*/
-
 .form-control, .btn {
-    border-radius: 0.5rem;
-    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
-}
-
-.btn-primary {
-    background-image: linear-gradient(135deg, #6c5ce7, #4834d4);
+    border-radius: 0.75rem;
     border: none;
 }
 
-.btn-primary:hover {
-    background-image: linear-gradient(135deg, #8172ff, #5748f5);
+.btn-primary {
+    background: linear-gradient(135deg, #4cc9f0 0%, #4361ee 100%);
+    box-shadow: 0 4px 15px rgba(76, 201, 240, 0.4);
 }
 
-/* Styling for table rows on hover. */
+.btn-primary:hover {
+    background: linear-gradient(135deg, #3a86ff 0%, #3a0ca3 100%);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(58, 12, 163, 0.35);
+}
+
 .table-hover tbody tr:hover {
-    background-color: rgba(0, 0, 0, 0.03);
-    transform: scale(1.01);
-    transition: transform 0.2s ease-in-out;
+    background: rgba(67, 97, 238, 0.05);
+}
+
+/* Colorful table highlights */
+.win-text {
+    color: #2ec4b6 !important;
+    text-shadow: 0 0 8px rgba(46, 196, 182, 0.3);
+}
+
+.loss-text {
+    color: #ff3860 !important;
+    text-shadow: 0 0 8px rgba(255, 56, 96, 0.3);
 }
 
 /*========================================================================================
-    5. THEME MODES
+    5. DARK MODE - COLORFUL DARK THEME
 ========================================================================================*/
-
-/* Dark Mode: Theming for the entire dashboard. */
 @media (prefers-color-scheme: dark) {
     body {
-        background: #121212;
-        color: #e0e0e0;
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        color: #e2e8f0;
     }
     
     .navbar.bg-primary {
-        background-color: #1a1a1a !important;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        background: linear-gradient(90deg, #3a0ca3 0%, #7209b7 100%) !important;
     }
 
     .card {
-        background-color: rgba(30, 30, 30, 0.9);
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(30, 41, 59, 0.85);
+        box-shadow: 0 8px 32px rgba(17, 24, 39, 0.5);
+    }
+    
+    .card::before {
+        background: linear-gradient(90deg, #4895ef 0%, #7209b7 50%, #3a0ca3 100%);
     }
 
-    .card-header.bg-white {
-        background-color: #1f1f1f !important;
-        color: #e0e0e0;
+    .btn-primary {
+        background: linear-gradient(135deg, #4895ef 0%, #7209b7 100%);
     }
-
-    .text-muted, .card-title {
-        color: #a0a0a0 !important;
-    }
-
+    
     .table {
-        --bs-table-bg: #1e1e1e;
-        --bs-table-color: #e0e0e0;
-        --bs-table-hover-bg: rgba(255, 255, 255, 0.08);
+        --bs-table-bg: #1e293b;
+        --bs-table-color: #f1f5f9;
+        --bs-table-hover-bg: rgba(99, 102, 241, 0.1);
     }
-    
-    .table-light {
-        --bs-table-bg: #2a2a2a;
-        --bs-table-color: #e0e0e0;
-    }
-    
+
     .form-control {
-        background-color: #2a2a2a;
-        color: #e0e0e0;
-        border: 1px solid #444;
-    }
-    
-    .form-control::placeholder {
-        color: #888;
+        background-color: #334155;
+        color: #e2e8f0;
+        border: 1px solid #475569;
     }
 }
 
 /*========================================================================================
-    6. RESPONSIVE & MODERN LAYOUTS
+    6. SPECIAL EFFECTS
 ========================================================================================*/
-
-/* Adjust chart sizing for smaller screens */
-.card-body canvas {
-    height: 250px;
-    max-height: 250px;
+/* Animated gradient border */
+@keyframes border-pulse {
+    0% { background-position: 0% 50% }
+    50% { background-position: 100% 50% }
+    100% { background-position: 0% 50% }
 }
 
-@media (min-width: 768px) {
-    .card-body canvas {
-        height: 400px;
-        max-height: 400px;
-    }
+.card:hover::before {
+    height: 6px;
+    background-size: 200% auto;
+    animation: border-pulse 2s linear infinite;
 }
 
-/*========================================================================================
-    7. SPECIAL VISUAL EFFECTS
-========================================================================================*/
-
-/* Add a subtle glow on hover for win/loss colors. */
-.table tbody tr td:nth-child(5).win-text {
-    color: #198754;
-    text-shadow: 0 0 5px rgba(25, 135, 84, 0.5);
+/* Floating animation for cards */
+@keyframes float {
+    0% { transform: translateY(0px) }
+    50% { transform: translateY(-10px) }
+    100% { transform: translateY(0px) }
 }
 
-.table tbody tr td:nth-child(5).loss-text {
-    color: #dc3545;
-    text-shadow: 0 0 5px rgba(220, 53, 69, 0.5);
+.card:hover {
+    animation: float 3s ease-in-out infinite;
 }
