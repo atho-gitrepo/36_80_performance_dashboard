@@ -34,6 +34,10 @@ async function fetchDashboardData() {
         createOutcomeByScoreChart(data.outcome_by_initial_score);
         createPerformanceByDayChart(data.performance_by_day_of_week);
 
+        // --- New: Update charts for country and bet type ---
+        createPerformanceByCountryChart(data.performance_by_country);
+        createPerformanceByBetTypeChart(data.performance_by_bet_type);
+
     } catch (error) {
         console.error("Error fetching dashboard data:", error);
     }
@@ -77,6 +81,8 @@ function updateRecentBetsTable(bets) {
 // --- New Chart Functions ---
 let scoreChartInstance = null;
 let dayChartInstance = null;
+let countryChartInstance = null; // New chart instance for countries
+let betTypeChartInstance = null; // New chart instance for bet types
 
 // Creates a chart showing wins/losses grouped by initial score
 function createOutcomeByScoreChart(data) {
@@ -183,6 +189,110 @@ function createPerformanceByDayChart(data) {
                 title: {
                     display: true,
                     text: 'Performance by Day of the Week'
+                }
+            }
+        }
+    });
+}
+
+// --- New Chart: Performance by Country ---
+function createPerformanceByCountryChart(data) {
+    const ctx = document.getElementById('performanceByCountryChart');
+    if (!ctx) return;
+
+    if (countryChartInstance) {
+        countryChartInstance.destroy();
+    }
+
+    const labels = Object.keys(data);
+    const winData = labels.map(label => data[label].wins);
+    const lossData = labels.map(label => data[label].losses);
+
+    countryChartInstance = new Chart(ctx.getContext('2d'), {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Wins',
+                    data: winData,
+                    backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                },
+                {
+                    label: 'Losses',
+                    data: lossData,
+                    backgroundColor: 'rgba(255, 99, 132, 0.6)',
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Number of Bets'
+                    }
+                }
+            },
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Performance by Country'
+                }
+            }
+        }
+    });
+}
+
+// --- New Chart: Performance by Bet Type ---
+function createPerformanceByBetTypeChart(data) {
+    const ctx = document.getElementById('performanceByBetTypeChart');
+    if (!ctx) return;
+
+    if (betTypeChartInstance) {
+        betTypeChartInstance.destroy();
+    }
+
+    const labels = Object.keys(data);
+    const winData = labels.map(label => data[label].wins);
+    const lossData = labels.map(label => data[label].losses);
+
+    betTypeChartInstance = new Chart(ctx.getContext('2d'), {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Wins',
+                    data: winData,
+                    backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                },
+                {
+                    label: 'Losses',
+                    data: lossData,
+                    backgroundColor: 'rgba(255, 99, 132, 0.6)',
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Number of Bets'
+                    }
+                }
+            },
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Performance by Bet Type'
                 }
             }
         }
