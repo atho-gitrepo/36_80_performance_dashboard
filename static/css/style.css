@@ -1,92 +1,193 @@
-/* Custom CSS for Betting Strategy Dashboard */
+/*========================================================================================
+    1. TYPOGRAPHY & TEXT EFFECTS
+========================================================================================*/
 
-/* General Body and Font Styles */
+/* Set a clean, modern font stack for the entire application. */
 body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    transition: background-color 0.3s, color 0.3s;
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: #495057; /* A soft, dark gray for good readability. */
+    transition: background-color 0.4s ease, color 0.4s ease;
 }
 
-/* Header & Navbar */
-.navbar-brand {
-    font-weight: 700;
+/* Use a slightly bolder font-weight for headings and important text. */
+.navbar-brand, .card-title, .fs-2 {
+    font-weight: 600;
+    letter-spacing: -0.5px;
 }
 
-/* Card Styles */
+/* Add a subtle underline effect on hover for clickable elements. */
+.card:hover, .btn:hover {
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+/*========================================================================================
+    2. BACKGROUND & LAYOUT
+========================================================================================*/
+
+/* A clean, consistent background with a soft gradient. */
+body.bg-light {
+    background: #f8f9fa;
+    /* Optional: subtle radial gradient for depth. */
+    /* background: radial-gradient(circle at top left, #f8f9fa, #e9ecef); */
+}
+
+/* Add a modern, glassy effect to the cards using a backdrop filter. */
 .card {
-    border-radius: 0.75rem;
+    border-radius: 1rem; /* More rounded corners. */
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    background-color: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px); /* This creates the frosted glass effect. */
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+/*========================================================================================
+    3. ANIMATIONS & TRANSITIONS
+========================================================================================*/
+
+/* Apply a smooth transition to all transforms and box-shadows. */
+.card, .btn {
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* A slight bounce effect on hover for cards. */
+.card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+}
+
+/* Ripple effect on buttons (requires JS). */
+/* For CSS-only, use a pseudo-element. */
+.btn {
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.btn:after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 5px;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.5);
+    opacity: 0;
+    border-radius: 50%;
+    transform: scale(0);
+    transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+}
+
+.btn:active:after {
+    transform: scale(40);
+    opacity: 1;
+}
+
+/*========================================================================================
+    4. BUTTONS & UI ELEMENTS
+========================================================================================*/
+
+.form-control, .btn {
+    border-radius: 0.5rem;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.btn-primary {
+    background-image: linear-gradient(135deg, #6c5ce7, #4834d4);
     border: none;
+}
+
+.btn-primary:hover {
+    background-image: linear-gradient(135deg, #8172ff, #5748f5);
+}
+
+/* Styling for table rows on hover. */
+.table-hover tbody tr:hover {
+    background-color: rgba(0, 0, 0, 0.03);
+    transform: scale(1.01);
     transition: transform 0.2s ease-in-out;
 }
 
-.card:hover {
-    transform: translateY(-5px);
-}
+/*========================================================================================
+    5. THEME MODES
+========================================================================================*/
 
-.card-title {
-    font-weight: 600;
-}
-
-/* KPI Card Text */
-.card-text.fs-2 {
-    font-weight: 700;
-}
-
-/* Chart Canvas Styling */
-canvas {
-    max-height: 400px;
-}
-
-/* Table Styles */
-.table {
-    white-space: nowrap;
-}
-
-.table-hover tbody tr:hover {
-    --bs-table-hover-bg: rgba(0, 0, 0, 0.03); /* Subtle hover effect */
-}
-
-/* Outcome-specific colors in the table */
-.table tbody tr td:nth-child(5) {
-    font-weight: 600;
-}
-
-.table tbody tr td:nth-child(5):contains('win') {
-    color: #198754; /* Bootstrap success green */
-}
-
-.table tbody tr td:nth-child(5):contains('loss') {
-    color: #dc3545; /* Bootstrap danger red */
-}
-
-/* Dark Mode Implementation (Optional) */
+/* Dark Mode: Theming for the entire dashboard. */
 @media (prefers-color-scheme: dark) {
-    body.bg-light {
-        background-color: #1a1a1a !important;
+    body {
+        background: #121212;
         color: #e0e0e0;
     }
+    
     .navbar.bg-primary {
-        background-color: #151515 !important;
+        background-color: #1a1a1a !important;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     }
+
     .card {
-        background-color: #2a2a2a;
-        color: #e0e0e0;
+        background-color: rgba(30, 30, 30, 0.9);
+        border: 1px solid rgba(255, 255, 255, 0.1);
     }
+
     .card-header.bg-white {
-        background-color: #333333 !important;
+        background-color: #1f1f1f !important;
         color: #e0e0e0;
     }
-    .card-title, .text-muted {
-        color: #b0b0b0 !important;
+
+    .text-muted, .card-title {
+        color: #a0a0a0 !important;
     }
+
     .table {
+        --bs-table-bg: #1e1e1e;
+        --bs-table-color: #e0e0e0;
+        --bs-table-hover-bg: rgba(255, 255, 255, 0.08);
+    }
+    
+    .table-light {
         --bs-table-bg: #2a2a2a;
         --bs-table-color: #e0e0e0;
     }
-    .table-light {
-        --bs-table-bg: #333333;
-        --bs-table-color: #e0e0e0;
+    
+    .form-control {
+        background-color: #2a2a2a;
+        color: #e0e0e0;
+        border: 1px solid #444;
     }
-    .table-hover tbody tr:hover {
-        --bs-table-hover-bg: rgba(255, 255, 255, 0.05);
+    
+    .form-control::placeholder {
+        color: #888;
     }
+}
+
+/*========================================================================================
+    6. RESPONSIVE & MODERN LAYOUTS
+========================================================================================*/
+
+/* Adjust chart sizing for smaller screens */
+.card-body canvas {
+    height: 250px;
+    max-height: 250px;
+}
+
+@media (min-width: 768px) {
+    .card-body canvas {
+        height: 400px;
+        max-height: 400px;
+    }
+}
+
+/*========================================================================================
+    7. SPECIAL VISUAL EFFECTS
+========================================================================================*/
+
+/* Add a subtle glow on hover for win/loss colors. */
+.table tbody tr td:nth-child(5).win-text {
+    color: #198754;
+    text-shadow: 0 0 5px rgba(25, 135, 84, 0.5);
+}
+
+.table tbody tr td:nth-child(5).loss-text {
+    color: #dc3545;
+    text-shadow: 0 0 5px rgba(220, 53, 69, 0.5);
 }
