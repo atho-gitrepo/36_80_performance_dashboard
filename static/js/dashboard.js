@@ -43,11 +43,20 @@ function updateKPIs(kpis) {
     document.getElementById('total-bets').textContent = kpis.total_bets;
     document.getElementById('win-rate').textContent = `${kpis.win_rate}%`;
     document.getElementById('net-profit').textContent = kpis.net_profit;
-    document.getElementById('roi').textContent = `${kpis.roi}%`;
+    // Check if the ROI element exists before trying to update it
+    const roiElement = document.getElementById('roi');
+    if (roiElement) {
+      roiElement.textContent = `${kpis.roi}%`;
+    }
 }
 
 function updateRecentBetsTable(bets) {
     const tableBody = document.getElementById('recentBetsTableBody');
+    if (!tableBody) {
+        console.error("Error: recentBetsTableBody element not found.");
+        return;
+    }
+    
     tableBody.innerHTML = ''; // Clear existing rows
 
     bets.forEach(bet => {
@@ -71,7 +80,8 @@ let dayChartInstance = null;
 
 // Creates a chart showing wins/losses grouped by initial score
 function createOutcomeByScoreChart(data) {
-    const ctx = document.getElementById('outcomeByScoreChart').getContext('2d');
+    const ctx = document.getElementById('outcomeByScoreChart');
+    if (!ctx) return; // Exit if canvas is not found
     
     // Destroy previous chart instance if it exists
     if (scoreChartInstance) {
@@ -82,7 +92,7 @@ function createOutcomeByScoreChart(data) {
     const winData = labels.map(label => data[label].wins);
     const lossData = labels.map(label => data[label].losses);
 
-    scoreChartInstance = new Chart(ctx, {
+    scoreChartInstance = new Chart(ctx.getContext('2d'), {
         type: 'bar',
         data: {
             labels: labels,
@@ -123,7 +133,8 @@ function createOutcomeByScoreChart(data) {
 
 // Creates a chart showing performance by day of the week
 function createPerformanceByDayChart(data) {
-    const ctx = document.getElementById('performanceByDayChart').getContext('2d');
+    const ctx = document.getElementById('performanceByDayChart');
+    if (!ctx) return; // Exit if canvas is not found
 
     // Destroy previous chart instance if it exists
     if (dayChartInstance) {
@@ -135,7 +146,7 @@ function createPerformanceByDayChart(data) {
     const winData = labels.map(day => data[day].wins);
     const lossData = labels.map(day => data[day].losses);
 
-    dayChartInstance = new Chart(ctx, {
+    dayChartInstance = new Chart(ctx.getContext('2d'), {
         type: 'line',
         data: {
             labels: labels,
