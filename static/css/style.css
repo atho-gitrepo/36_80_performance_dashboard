@@ -38,15 +38,6 @@ body::before {
 /*========================================================================================
     2. BACKGROUND & LAYOUT - FOOTBALL THEME
 ========================================================================================*/
-body.bg-light {
-    background: 
-        linear-gradient(rgba(0, 20, 0, 0.85), rgba(0, 10, 0, 0.9)),
-        url('https://images.unsplash.com/photo-1552667466-07770ae110d0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80');
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
-}
-
 .navbar.bg-primary {
     background: linear-gradient(90deg, #0a7e36 0%, #0d5729 100%) !important;
     box-shadow: 0 4px 20px rgba(10, 126, 54, 0.4);
@@ -134,48 +125,7 @@ body.bg-light {
 }
 
 /*========================================================================================
-    5. DARK MODE - FOOTBALL DARK THEME
-========================================================================================*/
-@media (prefers-color-scheme: dark) {
-    body {
-        background: 
-            linear-gradient(rgba(0, 10, 0, 0.9), rgba(0, 5, 0, 0.95)),
-            url('https://images.unsplash.com/photo-1552667466-07770ae110d0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80');
-        color: #f0f0f0;
-    }
-    
-    .navbar.bg-primary {
-        background: linear-gradient(90deg, #0d5729 0%, #0a3e1f 100%) !important;
-    }
-
-    .card {
-        background: rgba(5, 30, 10, 0.8);
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-    }
-    
-    .card::before {
-        background: linear-gradient(90deg, #0a7e36, #689f38);
-    }
-
-    .btn-primary {
-        background: linear-gradient(135deg, #0d5729 0%, #689f38 100%);
-    }
-    
-    .table {
-        --bs-table-bg: #051e0a;
-        --bs-table-color: #f1f5f9;
-        --bs-table-hover-bg: rgba(20, 100, 40, 0.3);
-    }
-
-    .form-control {
-        background-color: #0a3e1f;
-        color: #e2e8f0;
-        border: 1px solid #1a5e2a;
-    }
-}
-
-/*========================================================================================
-    6. SPECIAL EFFECTS
+    5. SPECIAL EFFECTS
 ========================================================================================*/
 /* Animated gradient border */
 @keyframes border-pulse {
