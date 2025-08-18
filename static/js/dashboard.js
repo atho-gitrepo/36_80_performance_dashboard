@@ -9,13 +9,14 @@ document.addEventListener('DOMContentLoaded', () => {
 async function fetchDashboardData() {
     const start_date = document.getElementById('startDate').value;
     const end_date = document.getElementById('endDate').value;
-    const match_name = document.getElementById('matchName') ? document.getElementById('matchName').value : '';
+    // Correctly get the values from the input fields by their IDs
+    const matchName = document.getElementById('matchName') ? document.getElementById('matchName').value : '';
     const league = document.getElementById('leagueName') ? document.getElementById('leagueName').value : '';
 
     const queryParams = new URLSearchParams();
     if (start_date) queryParams.append('start_date', start_date);
     if (end_date) queryParams.append('end_date', end_date);
-    if (match_name) queryParams.append('match_name', match_name);
+    if (matchName) queryParams.append('match_name', matchName);
     if (league) queryParams.append('league', league);
 
     try {
@@ -33,8 +34,6 @@ async function fetchDashboardData() {
         // Update charts with new data structures
         createOutcomeByScoreChart(data.outcome_by_initial_score);
         createPerformanceByDayChart(data.performance_by_day_of_week);
-
-        // --- New: Update charts for country and bet type ---
         createPerformanceByCountryChart(data.performance_by_country);
         createPerformanceByBetTypeChart(data.performance_by_bet_type);
 
@@ -47,7 +46,6 @@ function updateKPIs(kpis) {
     document.getElementById('total-bets').textContent = kpis.total_bets;
     document.getElementById('win-rate').textContent = `${kpis.win_rate}%`;
     document.getElementById('net-profit').textContent = kpis.net_profit;
-    // Check if the ROI element exists before trying to update it
     const roiElement = document.getElementById('roi');
     if (roiElement) {
       roiElement.textContent = `${kpis.roi}%`;
@@ -81,15 +79,14 @@ function updateRecentBetsTable(bets) {
 // --- New Chart Functions ---
 let scoreChartInstance = null;
 let dayChartInstance = null;
-let countryChartInstance = null; // New chart instance for countries
-let betTypeChartInstance = null; // New chart instance for bet types
+let countryChartInstance = null;
+let betTypeChartInstance = null;
 
 // Creates a chart showing wins/losses grouped by initial score
 function createOutcomeByScoreChart(data) {
     const ctx = document.getElementById('outcomeByScoreChart');
-    if (!ctx) return; // Exit if canvas is not found
+    if (!ctx) return;
     
-    // Destroy previous chart instance if it exists
     if (scoreChartInstance) {
         scoreChartInstance.destroy();
     }
@@ -140,9 +137,8 @@ function createOutcomeByScoreChart(data) {
 // Creates a chart showing performance by day of the week
 function createPerformanceByDayChart(data) {
     const ctx = document.getElementById('performanceByDayChart');
-    if (!ctx) return; // Exit if canvas is not found
+    if (!ctx) return;
 
-    // Destroy previous chart instance if it exists
     if (dayChartInstance) {
         dayChartInstance.destroy();
     }
