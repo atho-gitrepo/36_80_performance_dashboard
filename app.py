@@ -4,6 +4,7 @@ from firebase_admin import firestore, credentials, initialize_app
 import os
 import json
 from datetime import datetime, timedelta
+from collections import defaultdict
 
 app = Flask(__name__)
 
@@ -22,7 +23,8 @@ try:
     print("✅ Web app: Firebase initialized successfully.")
 except Exception as e:
     print(f"❌ Web app: Failed to initialize Firebase: {e}")
-    # Consider what to do here. Maybe render an error page.
+    # In a production app, you might want to handle this gracefully
+    # e.g., by returning an error page or a 500 status code.
 
 # --- Data Processing Functions ---
 def calculate_kpis(bets):
@@ -34,7 +36,7 @@ def calculate_kpis(bets):
             "roi": 0, "biggest_win_streak": 0, "biggest_loss_streak": 0
         }
 
-    wins = [b for b in bets if b['outcome'] == 'win']
+    wins = [b for b in bets if b.get('outcome') == 'win']
     win_count = len(wins)
     
     win_rate = (win_count / total_bets) * 100
@@ -50,11 +52,11 @@ def calculate_kpis(bets):
     biggest_loss_streak = 0
     
     for bet in bets:
-        if bet['outcome'] == 'win':
+        if bet.get('outcome') == 'win':
             current_win_streak += 1
             biggest_win_streak = max(biggest_win_streak, current_win_streak)
             current_loss_streak = 0
-        elif bet['outcome'] == 'loss':
+        elif bet.get('outcome') == 'loss':
             current_loss_streak += 1
             biggest_loss_streak = max(biggest_loss_streak, current_loss_streak)
             current_win_streak = 0
@@ -72,16 +74,22 @@ def get_resolved_bets_data(start_date=None, end_date=None, match_name=None, leag
     """Fetches resolved bets from Firestore, with optional date and name filtering."""
     try:
         query = db.collection('resolved_bets')
+        
+        # Use a single query that combines filters
         if start_date:
             query = query.where('placed_at', '>=', start_date)
         if end_date:
             query = query.where('placed_at', '<=', end_date)
+        
+        # Note: '==' filtering for match/league names can be slow without indexes
         if match_name:
             query = query.where('match_name', '==', match_name)
         if league_name:
             query = query.where('league', '==', league_name)
-
-        docs = query.order_by('resolved_at', direction=firestore.Query.DESCENDING).stream()
+        
+        # Always order by a field used in the query for performance
+        docs = query.order_by('placed_at', direction=firestore.Query.DESCENDING).stream()
+        
         return [doc.to_dict() for doc in docs]
     except Exception as e:
         print(f"❌ Firestore Error during data fetch: {e}")
@@ -103,71 +111,88 @@ def get_dashboard_data():
     match_name = request.args.get('match_name')
     league_name = request.args.get('league')
 
-    start_date = datetime.fromisoformat(start_date_str) if start_date_str else None
-    end_date = datetime.fromisoformat(end_date_str) if end_date_str else None
+    start_date = start_date_str if start_date_str else None
+    end_date = end_date_str if end_date_str else None
 
     bets = get_resolved_bets_data(start_date, end_date, match_name, league_name)
     
     kpis = calculate_kpis(bets)
     
-    # New data structures to replace profit trends
-    outcome_by_initial_score = {}
-    performance_by_day_of_week = {}
-    
-    # New data structures for the new charts
-    performance_by_country = {}
-    performance_by_bet_type = {}
+    # New data structures to build charts
+    performance_by_initial_score = defaultdict(lambda: {"wins": 0, "losses": 0})
+    performance_by_day_of_week = defaultdict(lambda: {"wins": 0, "losses": 0})
+    performance_by_country = defaultdict(lambda: {"wins": 0, "losses": 0})
+    performance_by_bet_type = defaultdict(lambda: {"wins": 0, "losses": 0})
+    daily_profit_trend = defaultdict(int)
     
     for bet in bets:
-        # Determine the initial score key
-        bet_type = bet.get('bet_type', 'Unknown')
-        initial_score_key = '36_score' if bet_type == 'regular' else '80_score'
-        initial_score = bet.get(initial_score_key, 'N/A')
-        
-        # Performance by Initial Score
-        if initial_score not in outcome_by_initial_score:
-            outcome_by_initial_score[initial_score] = {"wins": 0, "losses": 0}
-        
-        if bet['outcome'] == 'win':
-            outcome_by_initial_score[initial_score]['wins'] += 1
-        else:
-            outcome_by_initial_score[initial_score]['losses'] += 1
+        try:
+            outcome = bet.get('outcome')
+            bet_type = bet.get('bet_type', 'Unknown')
             
-        # Performance by Day of the Week
-        placed_at = bet.get('placed_at')
-        if placed_at:
-            day_of_week = datetime.fromisoformat(placed_at).strftime('%A')
-            if day_of_week not in performance_by_day_of_week:
-                performance_by_day_of_week[day_of_week] = {"wins": 0, "losses": 0}
-            if bet['outcome'] == 'win':
-                performance_by_day_of_week[day_of_week]['wins'] += 1
-            else:
-                performance_by_day_of_week[day_of_week]['losses'] += 1
+            # Profit Calculation
+            profit_unit = 1 if outcome == 'win' else -1
+            
+            # Performance by Initial Score
+            initial_score_key = '36_score' if bet_type == 'regular' else '80_score'
+            initial_score = bet.get(initial_score_key, 'N/A')
+            if outcome == 'win':
+                performance_by_initial_score[initial_score]['wins'] += 1
+            elif outcome == 'loss':
+                performance_by_initial_score[initial_score]['losses'] += 1
+            
+            # Performance by Day of the Week
+            placed_at_str = bet.get('placed_at')
+            if placed_at_str:
+                placed_at_date = datetime.strptime(placed_at_str, '%Y-%m-%d %H:%M:%S').date()
+                day_of_week = placed_at_date.strftime('%A')
+                if outcome == 'win':
+                    performance_by_day_of_week[day_of_week]['wins'] += 1
+                elif outcome == 'loss':
+                    performance_by_day_of_week[day_of_week]['losses'] += 1
+                    
+                # Daily Profit Trend
+                daily_profit_trend[placed_at_date] += profit_unit
                 
-        # --- New: Performance by Country ---
-        country = bet.get('country', 'Unknown')
-        if country not in performance_by_country:
-            performance_by_country[country] = {"wins": 0, "losses": 0}
-        if bet['outcome'] == 'win':
-            performance_by_country[country]['wins'] += 1
-        else:
-            performance_by_country[country]['losses'] += 1
+            # Performance by Country
+            country = bet.get('country', 'Unknown')
+            if outcome == 'win':
+                performance_by_country[country]['wins'] += 1
+            elif outcome == 'loss':
+                performance_by_country[country]['losses'] += 1
 
-        # --- New: Performance by Bet Type ---
-        bet_type_name = bet.get('bet_type', 'Unknown')
-        if bet_type_name not in performance_by_bet_type:
-            performance_by_bet_type[bet_type_name] = {"wins": 0, "losses": 0}
-        if bet['outcome'] == 'win':
-            performance_by_bet_type[bet_type_name]['wins'] += 1
-        else:
-            performance_by_bet_type[bet_type_name]['losses'] += 1
+            # Performance by Bet Type
+            if outcome == 'win':
+                performance_by_bet_type[bet_type]['wins'] += 1
+            elif outcome == 'loss':
+                performance_by_bet_type[bet_type]['losses'] += 1
+
+        except (KeyError, ValueError) as e:
+            print(f"Skipping malformed bet document: {e} in {bet}")
+            continue
+
+    # Prepare data for plotting
+    sorted_daily_profit = sorted(daily_profit_trend.items())
+    profit_trend_data = []
+    cumulative_profit = 0
+    for date, profit in sorted_daily_profit:
+        cumulative_profit += profit
+        profit_trend_data.append({"date": date.isoformat(), "profit": cumulative_profit})
+        
+    def calculate_win_rate(data_dict):
+        return {
+            key: round(val['wins'] / (val['wins'] + val['losses']) * 100, 2)
+            if (val['wins'] + val['losses']) > 0 else 0
+            for key, val in data_dict.items()
+        }
 
     return jsonify({
         "kpis": kpis,
-        "outcome_by_initial_score": outcome_by_initial_score,
-        "performance_by_day_of_week": performance_by_day_of_week,
-        "performance_by_country": performance_by_country,
-        "performance_by_bet_type": performance_by_bet_type,
+        "performance_by_initial_score": calculate_win_rate(performance_by_initial_score),
+        "performance_by_day_of_week": calculate_win_rate(performance_by_day_of_week),
+        "performance_by_country": calculate_win_rate(performance_by_country),
+        "performance_by_bet_type": calculate_win_rate(performance_by_bet_type),
+        "daily_profit_trend": profit_trend_data,
         "recent_bets": bets[:50]
     })
 
