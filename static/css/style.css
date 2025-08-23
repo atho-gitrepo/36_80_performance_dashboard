@@ -1,536 +1,359 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Colorful Dashboard</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        :root {
-            --primary: #4361ee;
-            --secondary: #3a0ca3;
-            --accent: #4cc9f0;
-            --success: #2ec4b6;
-            --danger: #ff3860;
-            --warning: #ff9e00;
-            --info: #4895ef;
-            --dark: #0f172a;
-            --light: #f8f9fa;
-        }
+/* Updated style.css */
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+:root {
+    --primary: #5a52ff;
+    --secondary: #6e44ff;
+    --accent: #ff4d6b;
+    --success: #06d6a0;
+    --danger: #ef233c;
+    --warning: #ffb703;
+    --info: #00b4d8;
+    --dark: #1a1a2e;
+    --light: #f4f7f9;
+}
 
-        body {
-            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            color: #2c3e50;
-            background: linear-gradient(135deg, #f5f7fa 0%, #e4e7f4 100%);
-            min-height: 100vh;
-            padding: 20px;
-            transition: background-color 0.4s ease, color 0.4s ease;
-        }
+/* Global Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
-        .dashboard {
-            max-width: 1400px;
-            margin: 0 auto;
-        }
+body {
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: var(--dark);
+    background: linear-gradient(135deg, var(--light) 0%, #e2eafc 100%);
+    min-height: 100vh;
+    padding: 2.5rem 1rem;
+    transition: background-color 0.4s ease, color 0.4s ease;
+}
 
-        /* Header Styles */
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 0;
-            margin-bottom: 30px;
-        }
+.dashboard {
+    max-width: 1500px;
+    margin: 0 auto;
+    padding: 1.5rem;
+}
 
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
+/* Header Styles */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 0;
+    margin-bottom: 30px;
+}
 
-        .logo-icon {
-            width: 50px;
-            height: 50px;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
-        }
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
 
-        .logo-icon i {
-            font-size: 24px;
-            color: white;
-        }
+.logo-icon {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 15px rgba(90, 82, 255, 0.3);
+}
 
-        .logo-text h1 {
-            font-weight: 700;
-            font-size: 28px;
-            background: linear-gradient(90deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            letter-spacing: -0.5px;
-        }
+.logo-icon i {
+    font-size: 24px;
+    color: white;
+}
 
-        .logo-text p {
-            color: #718096;
-            font-size: 14px;
-        }
+.logo-text h1 {
+    font-weight: 700;
+    font-size: 28px;
+    background: linear-gradient(90deg, var(--primary), var(--secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -0.5px;
+}
 
-        /* Stats Container */
-        .stats-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 25px;
-            margin-bottom: 40px;
-        }
+.logo-text p {
+    color: #718096;
+    font-size: 14px;
+}
 
-        .stat-card {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-radius: 20px;
-            padding: 25px;
-            box-shadow: 0 8px 16px rgba(67, 97, 238, 0.15);
-            position: relative;
-            overflow: hidden;
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-        }
+/* Stats Container */
+.stats-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 25px;
+    margin-bottom: 40px;
+}
 
-        .stat-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, var(--accent) 0%, var(--primary) 50%, var(--secondary) 100%);
-        }
+.stat-card {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(90, 82, 255, 0.1);
+    position: relative;
+    overflow: hidden;
+    transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
 
-        .stat-card:hover {
-            transform: translateY(-8px) scale(1.02);
-            box-shadow: 0 15px 30px rgba(67, 97, 238, 0.25);
-        }
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 6px;
+    background: linear-gradient(90deg, var(--accent) 0%, var(--primary) 50%, var(--secondary) 100%);
+}
 
-        .stat-card:hover::before {
-            height: 6px;
-            background-size: 200% auto;
-            animation: border-pulse 2s linear infinite;
-        }
+.stat-card:hover {
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(90, 82, 255, 0.2);
+}
 
-        .stat-title {
-            color: #718096;
-            font-size: 16px;
-            font-weight: 500;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+.stat-card:hover::before {
+    height: 8px;
+    background-size: 200% auto;
+    animation: border-pulse 2s linear infinite;
+}
 
-        .stat-value {
-            font-size: 32px;
-            font-weight: 700;
-            margin-bottom: 5px;
-        }
+.stat-title {
+    color: rgba(0, 0, 0, 0.5);
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
 
-        /* Specific stat colors */
-        .total-bet .stat-value,
-        .win-rate .stat-value,
-        .total-win .stat-value {
-            color: white !important;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-        }
+.stat-value {
+    font-size: 38px;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 5px;
+    color: var(--dark);
+}
 
-        .total-bet {
-            background: linear-gradient(135deg, #ff6b6b, #ff3860);
-        }
+/* Specific stat colors for backgrounds and text */
+.total-bet { background: #5a52ff; color: white; }
+.win-rate { background: #ff4d6b; color: white; }
+.total-win { background: #06d6a0; color: white; }
+.profit { background: #ffb703; color: white; }
 
-        .win-rate {
-            background: linear-gradient(135deg, #4cc9f0, #4895ef);
-        }
+.stat-card.total-bet .stat-title,
+.stat-card.win-rate .stat-title,
+.stat-card.total-win .stat-title,
+.stat-card.profit .stat-title {
+    color: rgba(255, 255, 255, 0.7);
+}
 
-        .total-win {
-            background: linear-gradient(135deg, #2ec4b6, #06d6a0);
-        }
+.stat-card.total-bet .stat-value,
+.stat-card.win-rate .stat-value,
+.stat-card.total-win .stat-value,
+.stat-card.profit .stat-value {
+    color: white;
+}
 
-        .profit {
-            background: linear-gradient(135deg, #ffd166, #ff9e00);
-        }
+/* Main Content */
+.content-container {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 30px;
+    margin-bottom: 40px;
+}
 
-        /* Main Content */
-        .content-container {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 25px;
-            margin-bottom: 40px;
-        }
+.main-card, .sidebar-card {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(90, 82, 255, 0.1);
+    position: relative;
+    overflow: hidden;
+}
 
-        .main-card {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 8px 16px rgba(67, 97, 238, 0.15);
-            position: relative;
-            overflow: hidden;
-        }
+.main-card::before, .sidebar-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--accent) 0%, var(--primary) 50%, var(--secondary) 100%);
+}
 
-        .main-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, var(--accent) 0%, var(--primary) 50%, var(--secondary) 100%);
-        }
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
 
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-        }
+.card-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--dark);
+}
 
-        .card-title {
-            font-size: 22px;
-            font-weight: 700;
-            color: var(--dark);
-        }
+.btn {
+    background: linear-gradient(135deg, var(--secondary), var(--primary));
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+    box-shadow: 0 4px 15px rgba(110, 68, 255, 0.4);
+    transition: all 0.3s ease;
+}
 
-        .btn {
-            background: linear-gradient(135deg, var(--accent) 0%, var(--primary) 100%);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
-            z-index: 1;
-            box-shadow: 0 4px 15px rgba(76, 201, 240, 0.4);
-            transition: all 0.3s ease;
-        }
+.btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(110, 68, 255, 0.5);
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+}
 
-        .btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(58, 12, 163, 0.35);
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-        }
+/* Table Styles */
+.table-container {
+    overflow-x: auto;
+}
 
-        /* Table Styles */
-        .table-container {
-            overflow-x: auto;
-        }
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
+th, td {
+    padding: 18px 20px;
+    text-align: left;
+    border-bottom: 1px solid #e2eafc;
+}
 
-        th, td {
-            padding: 15px;
-            text-align: left;
-            border-bottom: 1px solid #e2e8f0;
-        }
+th {
+    background-color: var(--light);
+    font-weight: 600;
+    color: var(--primary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
 
-        th {
-            background-color: rgba(67, 97, 238, 0.05);
-            font-weight: 600;
-            color: var(--primary);
-        }
+tr:hover {
+    background-color: #f0f4f9;
+}
 
-        tr:hover {
-            background-color: rgba(67, 97, 238, 0.03);
-        }
+.win-text {
+    color: var(--success);
+    font-weight: 600;
+    text-shadow: 0 0 8px rgba(6, 214, 160, 0.2);
+}
 
-        .win-text {
-            color: var(--success) !important;
-            font-weight: 600;
-            text-shadow: 0 0 8px rgba(46, 196, 182, 0.3);
-        }
+.loss-text {
+    color: var(--danger);
+    font-weight: 600;
+    text-shadow: 0 0 8px rgba(239, 35, 60, 0.2);
+}
 
-        .loss-text {
-            color: var(--danger) !important;
-            font-weight: 600;
-            text-shadow: 0 0 8px rgba(255, 56, 96, 0.3);
-        }
+/* Sidebar Cards */
+.sidebar-card {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(90, 82, 255, 0.1);
+    margin-bottom: 30px;
+}
 
-        /* Sidebar Cards */
-        .sidebar-card {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-radius: 20px;
-            padding: 25px;
-            box-shadow: 0 8px 16px rgba(67, 97, 238, 0.15);
-            margin-bottom: 25px;
-            position: relative;
-        }
+.match-item {
+    padding: 15px;
+    border-bottom: 1px solid #e2eafc;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
 
-        .sidebar-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, var(--accent) 0%, var(--primary) 50%, var(--secondary) 100%);
-        }
+.match-item:last-child {
+    border-bottom: none;
+}
 
-        .progress-container {
-            margin: 20px 0;
-        }
+.match-teams {
+    font-weight: 500;
+    color: var(--dark);
+}
 
-        .progress-bar {
-            height: 10px;
-            background-color: #e2e8f0;
-            border-radius: 5px;
-            overflow: hidden;
-            margin-top: 8px;
-        }
+.match-date {
+    font-size: 12px;
+    color: #718096;
+}
 
-        .progress-fill {
-            height: 100%;
-            border-radius: 5px;
-        }
+/* Progress Bars */
+.progress-container {
+    margin: 25px 0;
+}
 
-        /* Animations */
-        @keyframes border-pulse {
-            0% { background-position: 0% 50% }
-            50% { background-position: 100% 50% }
-            100% { background-position: 0% 50% }
-        }
+.progress-label {
+    font-weight: 500;
+    color: #4a5568;
+    margin-bottom: 8px;
+}
 
-        @keyframes float {
-            0% { transform: translateY(0px) }
-            50% { transform: translateY(-10px) }
-            100% { transform: translateY(0px) }
-        }
+.progress-bar {
+    height: 12px;
+    background-color: #e2e8f0;
+    border-radius: 6px;
+    overflow: hidden;
+}
 
-        .stat-card:hover {
-            animation: float 3s ease-in-out infinite;
-        }
+.progress-fill {
+    height: 100%;
+    border-radius: 6px;
+    transition: width 1.5s ease-in-out;
+}
 
-        /* Footer */
-        .footer {
-            text-align: center;
-            padding: 25px;
-            color: #718096;
-            font-size: 14px;
-            border-top: 1px solid #e2e8f0;
-            margin-top: 20px;
-        }
+/* Animations */
+@keyframes border-pulse {
+    0% { background-position: 0% 50% }
+    50% { background-position: 100% 50% }
+    100% { background-position: 0% 50% }
+}
 
-        /* Responsive */
-        @media (max-width: 992px) {
-            .content-container {
-                grid-template-columns: 1fr;
-            }
-        }
+@keyframes float {
+    0%, 100% { transform: translateY(0) }
+    50% { transform: translateY(-10px) }
+}
 
-        @media (max-width: 576px) {
-            .header {
-                flex-direction: column;
-                gap: 20px;
-            }
-            
-            .logo {
-                flex-direction: column;
-                text-align: center;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="dashboard">
-        <!-- Header -->
-        <header class="header">
-            <div class="logo">
-                <div class="logo-icon">
-                    <i class="fas fa-chart-line"></i>
-                </div>
-                <div class="logo-text">
-                    <h1>Betting Dashboard</h1>
-                    <p>Real-time analytics and insights</p>
-                </div>
-            </div>
-            <button class="btn">
-                <i class="fas fa-sync-alt"></i> Refresh Data
-            </button>
-        </header>
+.stat-card:hover {
+    animation: float 3s ease-in-out infinite;
+}
 
-        <!-- Stats Cards -->
-        <div class="stats-container">
-            <div class="stat-card total-bet">
-                <div class="stat-title">
-                    <i class="fas fa-coins"></i>
-                    TOTAL BET
-                </div>
-                <div class="stat-value">$42,580</div>
-                <div class="stat-change">↑ 12.4% from last month</div>
-            </div>
+/* Footer */
+.footer {
+    text-align: center;
+    padding: 25px;
+    color: #718096;
+    font-size: 14px;
+    border-top: 1px solid #e2eafc;
+    margin-top: 20px;
+}
 
-            <div class="stat-card win-rate">
-                <div class="stat-title">
-                    <i class="fas fa-trophy"></i>
-                    WIN RATE
-                </div>
-                <div class="stat-value">68.3%</div>
-                <div class="stat-change">↑ 5.2% from last month</div>
-            </div>
+/* Responsive */
+@media (max-width: 992px) {
+    .content-container {
+        grid-template-columns: 1fr;
+    }
+}
 
-            <div class="stat-card total-win">
-                <div class="stat-title">
-                    <i class="fas fa-wallet"></i>
-                    TOTAL WIN MATCHES
-                </div>
-                <div class="stat-value">142</div>
-                <div class="stat-change">↑ 8 matches from last month</div>
-            </div>
-
-            <div class="stat-card profit">
-                <div class="stat-title">
-                    <i class="fas fa-chart-line"></i>
-                    PROFIT
-                </div>
-                <div class="stat-value">$8,420</div>
-                <div class="stat-change">↑ 18.7% from last month</div>
-            </div>
-        </div>
-
-        <!-- Main Content -->
-        <div class="content-container">
-            <div class="main-card">
-                <div class="card-header">
-                    <h2 class="card-title">Recent Matches</h2>
-                    <button class="btn">
-                        <i class="fas fa-plus"></i> New Match
-                    </button>
-                </div>
-                
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Match</th>
-                                <th>Date</th>
-                                <th>Bet Amount</th>
-                                <th>Odds</th>
-                                <th>Result</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>Man City vs Liverpool</td>
-                                <td>Nov 12, 2023</td>
-                                <td>$1,200</td>
-                                <td>2.4</td>
-                                <td class="win-text">WIN (+$1,680)</td>
-                            </tr>
-                            <tr>
-                                <td>Barcelona vs Real Madrid</td>
-                                <td>Nov 10, 2023</td>
-                                <td>$800</td>
-                                <td>1.8</td>
-                                <td class="loss-text">LOSS</td>
-                            </tr>
-                            <tr>
-                                <td>Bayern vs Dortmund</td>
-                                <td>Nov 8, 2023</td>
-                                <td>$1,500</td>
-                                <td>2.1</td>
-                                <td class="win-text">WIN (+$1,650)</td>
-                            </tr>
-                            <tr>
-                                <td>PSG vs Marseille</td>
-                                <td>Nov 5, 2023</td>
-                                <td>$950</td>
-                                <td>1.9</td>
-                                <td class="win-text">WIN (+$855)</td>
-                            </tr>
-                            <tr>
-                                <td>Chelsea vs Arsenal</td>
-                                <td>Nov 3, 2023</td>
-                                <td>$1,100</td>
-                                <td>2.3</td>
-                                <td class="loss-text">LOSS</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <div class="sidebar">
-                <div class="sidebar-card">
-                    <h2 class="card-title">Performance</h2>
-                    <div class="progress-container">
-                        <div class="progress-label">Win Rate</div>
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: 68%; background: linear-gradient(90deg, var(--accent), var(--primary));"></div>
-                        </div>
-                    </div>
-                    <div class="progress-container">
-                        <div class="progress-label">Profit Margin</div>
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: 42%; background: linear-gradient(90deg, #ffd166, #ff9e00);"></div>
-                        </div>
-                    </div>
-                    <div class="progress-container">
-                        <div class="progress-label">Risk Level</div>
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: 35%; background: linear-gradient(90deg, #ff9e00, #ff3860);"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="sidebar-card">
-                    <h2 class="card-title">Upcoming Matches</h2>
-                    <div class="match-item">
-                        <div class="match-teams">Man United vs Chelsea</div>
-                        <div class="match-date">Nov 18, 2023</div>
-                    </div>
-                    <div class="match-item">
-                        <div class="match-teams">Juventus vs Inter</div>
-                        <div class="match-date">Nov 20, 2023</div>
-                    </div>
-                    <div class="match-item">
-                        <div class="match-teams">PSG vs Lyon</div>
-                        <div class="match-date">Nov 22, 2023</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Footer -->
-        <div class="footer">
-            <p>© 2023 Betting Dashboard | Real-time Analytics Platform</p>
-        </div>
-    </div>
-
-    <script>
-        // Simple animation for progress bars on load
-        document.addEventListener('DOMContentLoaded', function() {
-            const progressBars = document.querySelectorAll('.progress-fill');
-            progressBars.forEach(bar => {
-                const width = bar.style.width;
-                bar.style.width = '0';
-                setTimeout(() => {
-                    bar.style.transition = 'width 1.5s ease-in-out';
-                    bar.style.width = width;
-                }, 300);
-            });
-        });
-    </script>
-</body>
-</html>
+@media (max-width: 576px) {
+    .header {
+        flex-direction: column;
+        gap: 20px;
+    }
+    
+    .logo {
+        flex-direction: column;
+        text-align: center;
+    }
+}
