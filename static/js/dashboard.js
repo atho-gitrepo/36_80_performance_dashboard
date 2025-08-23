@@ -3,13 +3,25 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchDashboardData();
 
     // Event listener for the filter button
-    document.getElementById('filterButton').addEventListener('click', fetchDashboardData);
+    document.getElementById('filterButton').addEventListener('click', () => {
+        showLoadingSpinner();
+        fetchDashboardData();
+    });
 });
+
+function showLoadingSpinner() {
+    document.getElementById('loadingSpinner').style.display = 'block';
+    document.getElementById('dashboardContent').style.display = 'none';
+}
+
+function hideLoadingSpinner() {
+    document.getElementById('loadingSpinner').style.display = 'none';
+    document.getElementById('dashboardContent').style.display = 'block';
+}
 
 async function fetchDashboardData() {
     const start_date = document.getElementById('startDate').value;
     const end_date = document.getElementById('endDate').value;
-    // Correctly get the values from the input fields by their IDs
     const matchName = document.getElementById('matchName') ? document.getElementById('matchName').value : '';
     const league = document.getElementById('leagueName') ? document.getElementById('leagueName').value : '';
 
@@ -32,13 +44,16 @@ async function fetchDashboardData() {
         updateRecentBetsTable(data.recent_bets);
         
         // Update charts with new data structures
-        createOutcomeByScoreChart(data.outcome_by_initial_score);
+        createOutcomeByScoreChart(data.performance_by_initial_score);
         createPerformanceByDayChart(data.performance_by_day_of_week);
         createPerformanceByCountryChart(data.performance_by_country);
         createPerformanceByBetTypeChart(data.performance_by_bet_type);
-
+        createDailyProfitTrendChart(data.daily_profit_trend); // New chart
+        
     } catch (error) {
         console.error("Error fetching dashboard data:", error);
+    } finally {
+        hideLoadingSpinner();
     }
 }
 
@@ -64,52 +79,52 @@ function updateRecentBetsTable(bets) {
     bets.forEach(bet => {
         const row = document.createElement('tr');
         const outcomeClass = bet.outcome === 'win' ? 'win-text' : 'loss-text';
+        
+        // Use a more robust date parsing and formatting
+        const placedAtDate = bet.placed_at ? new Date(bet.placed_at) : null;
+        const placedAtDisplay = placedAtDate ? placedAtDate.toLocaleDateString() : 'N/A';
+        
         row.innerHTML = `
             <td>${bet.match_name}</td>
             <td>${bet.league}</td>
             <td>${bet.country}</td>
             <td>${bet.bet_type}</td>
             <td class="${outcomeClass}">${bet.outcome}</td>
-            <td>${bet.placed_at ? new Date(bet.placed_at).toLocaleString() : 'N/A'}</td>
+            <td>${placedAtDisplay}</td>
         `;
         tableBody.appendChild(row);
     });
 }
 
-// --- New Chart Functions ---
-let scoreChartInstance = null;
-let dayChartInstance = null;
-let countryChartInstance = null;
-let betTypeChartInstance = null;
+// --- Chart Functions with Enhancements ---
+let chartInstances = {};
 
-// Creates a chart showing wins/losses grouped by initial score
+function destroyChart(chartName) {
+    if (chartInstances[chartName]) {
+        chartInstances[chartName].destroy();
+        chartInstances[chartName] = null;
+    }
+}
+
 function createOutcomeByScoreChart(data) {
     const ctx = document.getElementById('outcomeByScoreChart');
     if (!ctx) return;
     
-    if (scoreChartInstance) {
-        scoreChartInstance.destroy();
-    }
+    destroyChart('outcomeByScoreChart');
 
     const labels = Object.keys(data);
-    const winData = labels.map(label => data[label].wins);
-    const lossData = labels.map(label => data[label].losses);
+    const chartData = labels.map(label => data[label]);
 
-    scoreChartInstance = new Chart(ctx.getContext('2d'), {
+    chartInstances['outcomeByScoreChart'] = new Chart(ctx.getContext('2d'), {
         type: 'bar',
         data: {
             labels: labels,
             datasets: [
                 {
-                    label: 'Wins',
-                    data: winData,
+                    label: 'Win Rate (%)',
+                    data: chartData,
                     backgroundColor: 'rgba(75, 192, 192, 0.6)',
                 },
-                {
-                    label: 'Losses',
-                    data: lossData,
-                    backgroundColor: 'rgba(255, 99, 132, 0.6)',
-                }
             ]
         },
         options: {
@@ -120,53 +135,43 @@ function createOutcomeByScoreChart(data) {
                     beginAtZero: true,
                     title: {
                         display: true,
-                        text: 'Number of Bets'
+                        text: 'Win Rate (%)'
                     }
                 }
             },
             plugins: {
                 title: {
                     display: true,
-                    text: 'Bet Outcomes by Initial Score'
+                    text: 'Win Rate by Initial Score'
                 }
             }
         }
     });
 }
 
-// Creates a chart showing performance by day of the week
 function createPerformanceByDayChart(data) {
     const ctx = document.getElementById('performanceByDayChart');
     if (!ctx) return;
 
-    if (dayChartInstance) {
-        dayChartInstance.destroy();
-    }
+    destroyChart('performanceByDayChart');
     
     const daysOrder = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-    const labels = daysOrder.filter(day => data[day]);
-    const winData = labels.map(day => data[day].wins);
-    const lossData = labels.map(day => data[day].losses);
+    const labels = daysOrder.filter(day => data[day] !== undefined);
+    const chartData = labels.map(day => data[day]);
 
-    dayChartInstance = new Chart(ctx.getContext('2d'), {
+    chartInstances['performanceByDayChart'] = new Chart(ctx.getContext('2d'), {
         type: 'line',
         data: {
             labels: labels,
             datasets: [
                 {
-                    label: 'Wins',
-                    data: winData,
+                    label: 'Win Rate (%)',
+                    data: chartData,
                     borderColor: 'rgba(75, 192, 192, 1)',
                     backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    tension: 0.4
+                    tension: 0.4,
+                    fill: true
                 },
-                {
-                    label: 'Losses',
-                    data: lossData,
-                    borderColor: 'rgba(255, 99, 132, 1)',
-                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                    tension: 0.4
-                }
             ]
         },
         options: {
@@ -177,48 +182,39 @@ function createPerformanceByDayChart(data) {
                     beginAtZero: true,
                     title: {
                         display: true,
-                        text: 'Number of Bets'
+                        text: 'Win Rate (%)'
                     }
                 }
             },
             plugins: {
                 title: {
                     display: true,
-                    text: 'Performance by Day of the Week'
+                    text: 'Win Rate by Day of the Week'
                 }
             }
         }
     });
 }
 
-// --- New Chart: Performance by Country ---
 function createPerformanceByCountryChart(data) {
     const ctx = document.getElementById('performanceByCountryChart');
     if (!ctx) return;
 
-    if (countryChartInstance) {
-        countryChartInstance.destroy();
-    }
+    destroyChart('performanceByCountryChart');
 
     const labels = Object.keys(data);
-    const winData = labels.map(label => data[label].wins);
-    const lossData = labels.map(label => data[label].losses);
+    const chartData = labels.map(label => data[label]);
 
-    countryChartInstance = new Chart(ctx.getContext('2d'), {
+    chartInstances['performanceByCountryChart'] = new Chart(ctx.getContext('2d'), {
         type: 'bar',
         data: {
             labels: labels,
             datasets: [
                 {
-                    label: 'Wins',
-                    data: winData,
+                    label: 'Win Rate (%)',
+                    data: chartData,
                     backgroundColor: 'rgba(75, 192, 192, 0.6)',
                 },
-                {
-                    label: 'Losses',
-                    data: lossData,
-                    backgroundColor: 'rgba(255, 99, 132, 0.6)',
-                }
             ]
         },
         options: {
@@ -229,47 +225,85 @@ function createPerformanceByCountryChart(data) {
                     beginAtZero: true,
                     title: {
                         display: true,
-                        text: 'Number of Bets'
+                        text: 'Win Rate (%)'
                     }
                 }
             },
             plugins: {
                 title: {
                     display: true,
-                    text: 'Performance by Country'
+                    text: 'Win Rate by Country'
                 }
             }
         }
     });
 }
 
-// --- New Chart: Performance by Bet Type ---
 function createPerformanceByBetTypeChart(data) {
     const ctx = document.getElementById('performanceByBetTypeChart');
     if (!ctx) return;
 
-    if (betTypeChartInstance) {
-        betTypeChartInstance.destroy();
-    }
+    destroyChart('performanceByBetTypeChart');
 
     const labels = Object.keys(data);
-    const winData = labels.map(label => data[label].wins);
-    const lossData = labels.map(label => data[label].losses);
+    const chartData = labels.map(label => data[label]);
 
-    betTypeChartInstance = new Chart(ctx.getContext('2d'), {
+    chartInstances['performanceByBetTypeChart'] = new Chart(ctx.getContext('2d'), {
         type: 'bar',
         data: {
             labels: labels,
             datasets: [
                 {
-                    label: 'Wins',
-                    data: winData,
+                    label: 'Win Rate (%)',
+                    data: chartData,
                     backgroundColor: 'rgba(75, 192, 192, 0.6)',
                 },
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Win Rate (%)'
+                    }
+                }
+            },
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Win Rate by Bet Type'
+                }
+            }
+        }
+    });
+}
+
+// --- New Chart: Cumulative Profit Trend ---
+function createDailyProfitTrendChart(data) {
+    const ctx = document.getElementById('dailyProfitTrendChart');
+    if (!ctx) return;
+    
+    destroyChart('dailyProfitTrendChart');
+
+    const labels = data.map(item => item.date);
+    const profitData = data.map(item => item.profit);
+
+    chartInstances['dailyProfitTrendChart'] = new Chart(ctx.getContext('2d'), {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [
                 {
-                    label: 'Losses',
-                    data: lossData,
-                    backgroundColor: 'rgba(255, 99, 132, 0.6)',
+                    label: 'Cumulative Net Profit',
+                    data: profitData,
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    fill: true,
+                    tension: 0.4
                 }
             ]
         },
@@ -281,14 +315,20 @@ function createPerformanceByBetTypeChart(data) {
                     beginAtZero: true,
                     title: {
                         display: true,
-                        text: 'Number of Bets'
+                        text: 'Net Profit (Units)'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Date'
                     }
                 }
             },
             plugins: {
                 title: {
                     display: true,
-                    text: 'Performance by Bet Type'
+                    text: 'Cumulative Profit Trend Over Time'
                 }
             }
         }
