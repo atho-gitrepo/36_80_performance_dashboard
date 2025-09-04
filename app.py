@@ -42,7 +42,7 @@ def calculate_kpis(bets):
     win_rate = (win_count / total_bets) * 100
     
     # Assuming a hypothetical bet size of 1 unit
-    net_profit = win_count - (total_bets - win_count)
+    net_profit = win_count
     roi = (net_profit / total_bets) * 100 if total_bets > 0 else 0
     
     # Calculate streaks (simplified)
