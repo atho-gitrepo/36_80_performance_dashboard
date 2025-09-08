@@ -198,4 +198,4 @@ def get_dashboard_data():
 
 if __name__ == '__main__':
     # Running locally for development
-    app.run(debug=True, port=8000)
+    app.run(debug=True, port=8081)
