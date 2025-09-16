@@ -42,7 +42,7 @@ def calculate_kpis(bets):
     win_rate = (win_count / total_bets) * 100
     
     # Assuming a hypothetical bet size of 1 unit
-    net_profit = win_count
+    net_profit = win_count - (total_bets - win_count)
     roi = (net_profit / total_bets) * 100 if total_bets > 0 else 0
     
     # Calculate streaks (simplified)
@@ -144,7 +144,8 @@ def get_dashboard_data():
             # Performance by Day of the Week
             placed_at_str = bet.get('placed_at')
             if placed_at_str:
-                placed_at_date = datetime.strptime(placed_at_str, '%Y-%m-%d %H:%M:%S').date()
+                # 🛠️ FIXED: The format string is updated to match the Firestore timestamp format
+                placed_at_date = datetime.strptime(placed_at_str, '%Y-%m-%dT%H:%M:%S.%f').date()
                 day_of_week = placed_at_date.strftime('%A')
                 if outcome == 'win':
                     performance_by_day_of_week[day_of_week]['wins'] += 1
@@ -199,3 +200,4 @@ def get_dashboard_data():
 if __name__ == '__main__':
     # Running locally for development
     app.run(debug=True, port=8081)
+
