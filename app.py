@@ -5,7 +5,6 @@ import os
 import json
 from datetime import datetime, timedelta
 from collections import defaultdict
-import time  # Import the time module
 
 app = Flask(__name__)
 
@@ -43,7 +42,7 @@ def calculate_kpis(bets):
     win_rate = (win_count / total_bets) * 100
     
     # Assuming a hypothetical bet size of 1 unit
-    net_profit = win_count - (total_bets - win_count)
+    net_profit = win_count
     roi = (net_profit / total_bets) * 100 if total_bets > 0 else 0
     
     # Calculate streaks (simplified)
@@ -74,9 +73,6 @@ def calculate_kpis(bets):
 def get_resolved_bets_data(start_date=None, end_date=None, match_name=None, league_name=None):
     """Fetches resolved bets from Firestore, with optional date and name filtering."""
     try:
-        print(f"🔄 Starting Firestore data fetch with filters: start_date={start_date}, end_date={end_date}, match_name={match_name}, league_name={league_name}")
-        start_time = time.time()
-        
         query = db.collection('resolved_bets')
         
         # Use a single query that combines filters
@@ -94,13 +90,7 @@ def get_resolved_bets_data(start_date=None, end_date=None, match_name=None, leag
         # Always order by a field used in the query for performance
         docs = query.order_by('placed_at', direction=firestore.Query.DESCENDING).stream()
         
-        data = [doc.to_dict() for doc in docs]
-        
-        end_time = time.time()
-        duration = end_time - start_time
-        print(f"✅ Firestore data fetch completed. Fetched {len(data)} documents in {duration:.2f} seconds.")
-        
-        return data
+        return [doc.to_dict() for doc in docs]
     except Exception as e:
         print(f"❌ Firestore Error during data fetch: {e}")
         return []
@@ -114,9 +104,6 @@ def index():
 @app.route('/api/dashboard_data')
 def get_dashboard_data():
     """API endpoint to fetch processed data for the dashboard."""
-    
-    print("➡️ API call received for /api/dashboard_data.")
-    request_start_time = time.time()
     
     # Get date range and filters from request
     start_date_str = request.args.get('start_date')
@@ -138,7 +125,6 @@ def get_dashboard_data():
     performance_by_bet_type = defaultdict(lambda: {"wins": 0, "losses": 0})
     daily_profit_trend = defaultdict(int)
     
-    data_processing_start = time.time()
     for bet in bets:
         try:
             outcome = bet.get('outcome')
@@ -158,7 +144,7 @@ def get_dashboard_data():
             # Performance by Day of the Week
             placed_at_str = bet.get('placed_at')
             if placed_at_str:
-                placed_at_date = datetime.strptime(placed_at_str, '%Y-%m-%dT%H:%M:%S.%f').date()
+                placed_at_date = datetime.strptime(placed_at_str, '%Y-%m-%d %H:%M:%S').date()
                 day_of_week = placed_at_date.strftime('%A')
                 if outcome == 'win':
                     performance_by_day_of_week[day_of_week]['wins'] += 1
@@ -182,11 +168,8 @@ def get_dashboard_data():
                 performance_by_bet_type[bet_type]['losses'] += 1
 
         except (KeyError, ValueError) as e:
-            print(f"⚠️ Skipping malformed bet document: {e} in {bet}")
+            print(f"Skipping malformed bet document: {e} in {bet}")
             continue
-
-    data_processing_duration = time.time() - data_processing_start
-    print(f"⏱️ Data processing completed in {data_processing_duration:.2f} seconds.")
 
     # Prepare data for plotting
     sorted_daily_profit = sorted(daily_profit_trend.items())
@@ -202,10 +185,6 @@ def get_dashboard_data():
             if (val['wins'] + val['losses']) > 0 else 0
             for key, val in data_dict.items()
         }
-
-    response_end_time = time.time()
-    response_duration = response_end_time - request_start_time
-    print(f"✅ Request to /api/dashboard_data completed successfully in {response_duration:.2f} seconds.")
 
     return jsonify({
         "kpis": kpis,
