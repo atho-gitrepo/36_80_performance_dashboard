@@ -24,19 +24,19 @@
 
         <div id="dashboardContent" style="display: none;">
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-8">
-                <div class="bg-white rounded-xl shadow-md p-6 h-full flex flex-col justify-center items-center transform transition-transform hover:scale-105">
+                <div class="bg-white rounded-xl shadow-md p-6 flex flex-col items-center transform transition-transform hover:scale-105">
                     <h5 class="text-gray-500 font-semibold text-lg">Total Bets</h5>
                     <p class="text-4xl font-bold text-gray-800 mt-2" id="total-bets">-</p>
                 </div>
-                <div class="bg-white rounded-xl shadow-md p-6 h-full flex flex-col justify-center items-center transform transition-transform hover:scale-105">
+                <div class="bg-white rounded-xl shadow-md p-6 flex flex-col items-center transform transition-transform hover:scale-105">
                     <h5 class="text-gray-500 font-semibold text-lg">Win Rate</h5>
                     <p class="text-4xl font-bold text-green-500 mt-2" id="win-rate">-</p>
                 </div>
-                <div class="bg-white rounded-xl shadow-md p-6 h-full flex flex-col justify-center items-center transform transition-transform hover:scale-105">
+                <div class="bg-white rounded-xl shadow-md p-6 flex flex-col items-center transform transition-transform hover:scale-105">
                     <h5 class="text-gray-500 font-semibold text-lg">Total Profit (Units)</h5>
                     <p class="text-4xl font-bold text-gray-800 mt-2" id="net-profit">-</p>
                 </div>
-                <div class="bg-white rounded-xl shadow-md p-6 h-full flex flex-col justify-center items-center transform transition-transform hover:scale-105">
+                <div class="bg-white rounded-xl shadow-md p-6 flex flex-col items-center transform transition-transform hover:scale-105">
                     <h5 class="text-gray-500 font-semibold text-lg">ROI</h5>
                     <p class="text-4xl font-bold text-gray-800 mt-2" id="roi">-</p>
                 </div>
@@ -46,21 +46,21 @@
                 <h5 class="text-xl font-semibold text-gray-800 mb-4">Filter Bet History</h5>
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <div>
-                        <label for="startDate" class="block text-sm font-medium text-gray-700">Start Date</label>
-                        <input type="date" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring h-10 px-2" id="startDate">
+                        <label class="block text-sm font-medium text-gray-700">Start Date</label>
+                        <input type="date" id="startDate" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm border h-10 px-2">
                     </div>
                     <div>
-                        <label for="endDate" class="block text-sm font-medium text-gray-700">End Date</label>
-                        <input type="date" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring h-10 px-2" id="endDate">
+                        <label class="block text-sm font-medium text-gray-700">End Date</label>
+                        <input type="date" id="endDate" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm border h-10 px-2">
                     </div>
                     <div>
-                        <label for="leagueDropdown" class="block text-sm font-medium text-gray-700">Country - League</label>
-                        <select id="leagueDropdown" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring h-10 px-2 bg-white">
+                        <label class="block text-sm font-medium text-gray-700">Country - League</label>
+                        <select id="leagueDropdown" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm border h-10 px-2 bg-white">
                             <option value="All">All Leagues</option>
                         </select>
                     </div>
                     <div class="self-end">
-                        <button class="w-full flex items-center justify-center px-4 py-2 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700" id="filterButton">
+                        <button id="filterButton" class="w-full flex items-center justify-center px-4 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700 transition">
                             <i class="fas fa-filter mr-2"></i>Apply Filters
                         </button>
                     </div>
@@ -109,6 +109,6 @@
             </div>
         </div>
     </div>
-    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+    <script src="/static/js/dashboard.js"></script>
 </body>
 </html>
