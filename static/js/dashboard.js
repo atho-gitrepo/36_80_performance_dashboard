@@ -7,7 +7,13 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 let chartInstances = {};
-function destroyChart(name) { if (chartInstances[name]) chartInstances[name].destroy(); }
+
+function destroyChart(name) {
+    if (chartInstances[name]) {
+        chartInstances[name].destroy();
+        chartInstances[name] = null;
+    }
+}
 
 function showLoadingSpinner() {
     document.getElementById('loadingSpinner').style.display = 'block';
@@ -34,32 +40,36 @@ async function fetchDashboardData() {
         updateDropdown(data.filter_options, league);
         updateRecentBetsTable(data.recent_bets);
         
-        // Render Charts
+        // Render all charts
         createDailyProfitTrendChart(data.daily_profit_trend);
         createOutcomeByScoreChart(data.performance_by_initial_score);
         createPerformanceByDayChart(data.performance_by_day_of_week);
         createPerformanceByCountryChart(data.performance_by_country);
-        createDailySummaryChart(data.daily_summary); // Replaced Bet Type
+        createDailySummaryChart(data.daily_summary);
         
-    } catch (error) { console.error("Error:", error); } 
-    finally { hideLoadingSpinner(); }
+    } catch (error) {
+        console.error("Dashboard Error:", error);
+    } finally {
+        hideLoadingSpinner();
+    }
 }
 
 function updateKPIs(kpis) {
     document.getElementById('total-bets').textContent = kpis.total_bets;
     document.getElementById('win-rate').textContent = `${kpis.win_rate}%`;
     document.getElementById('net-profit').textContent = kpis.net_profit;
-    if (document.getElementById('roi')) document.getElementById('roi').textContent = `${kpis.roi}%`;
+    document.getElementById('roi').textContent = `${kpis.roi}%`;
 }
 
-function updateDropdown(options, current) {
+function updateDropdown(options, currentSelection) {
     const select = document.getElementById('leagueDropdown');
+    const previousValue = currentSelection || "All";
     select.innerHTML = '<option value="All">All Leagues</option>';
     options.forEach(opt => {
         const el = document.createElement('option');
         el.value = opt;
         el.textContent = opt;
-        if (opt === current) el.selected = true;
+        if (opt === previousValue) el.selected = true;
         select.appendChild(el);
     });
 }
@@ -81,7 +91,7 @@ function updateRecentBetsTable(bets) {
     });
 }
 
-// --- Chart Functions ---
+// --- Chart Rendering Functions ---
 
 function createDailySummaryChart(data) {
     const ctx = document.getElementById('dailySummaryChart');
@@ -98,7 +108,8 @@ function createDailySummaryChart(data) {
         },
         options: { 
             responsive: true, maintainAspectRatio: false, 
-            scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true } }
+            scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true } },
+            plugins: { title: { display: true, text: 'Daily Volume (Wins vs Losses)' } }
         }
     });
 }
@@ -111,7 +122,14 @@ function createDailyProfitTrendChart(data) {
         type: 'line',
         data: {
             labels: data.map(d => d.date),
-            datasets: [{ label: 'Net Profit', data: data.map(d => d.profit), borderColor: '#3B82F6', tension: 0.4, fill: true, backgroundColor: 'rgba(59, 130, 246, 0.1)' }]
+            datasets: [{ 
+                label: 'Cumulative Net Profit', 
+                data: data.map(d => d.profit), 
+                borderColor: '#3B82F6', 
+                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                fill: true,
+                tension: 0.3 
+            }]
         },
         options: { responsive: true, maintainAspectRatio: false }
     });
@@ -125,9 +143,9 @@ function createOutcomeByScoreChart(data) {
         type: 'bar',
         data: {
             labels: Object.keys(data),
-            datasets: [{ label: 'Win Rate %', data: Object.values(data), backgroundColor: 'rgba(75, 192, 192, 0.6)' }]
+            datasets: [{ label: 'Win Rate %', data: Object.values(data), backgroundColor: 'rgba(75, 192, 192, 0.7)' }]
         },
-        options: { responsive: true, maintainAspectRatio: false }
+        options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, max: 100 } } }
     });
 }
 
@@ -139,9 +157,9 @@ function createPerformanceByDayChart(data) {
         type: 'line',
         data: {
             labels: Object.keys(data),
-            datasets: [{ label: 'Win Rate %', data: Object.values(data), borderColor: '#10B981', tension: 0.4 }]
+            datasets: [{ label: 'Win Rate %', data: Object.values(data), borderColor: '#10B981', backgroundColor: 'rgba(16, 185, 129, 0.1)', fill: true, tension: 0.4 }]
         },
-        options: { responsive: true, maintainAspectRatio: false }
+        options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, max: 100 } } }
     });
 }
 
@@ -155,6 +173,6 @@ function createPerformanceByCountryChart(data) {
             labels: Object.keys(data),
             datasets: [{ label: 'Win Rate %', data: Object.values(data), backgroundColor: '#6366F1' }]
         },
-        options: { responsive: true, maintainAspectRatio: false }
+        options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, max: 100 } } }
     });
 }
