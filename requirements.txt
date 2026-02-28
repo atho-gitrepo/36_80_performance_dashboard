@@ -1,3 +1,5 @@
 Flask
 firebase-admin
 gunicorn
+requests
+python-dateutil
